@@ -106,6 +106,11 @@ export function LessonLibrary() {
   const levels = [...new Set(state.lessons.filter((lesson) => !languageFilter || lesson.language === languageFilter).map((lesson) => lesson.level))].sort();
   const topics = [...new Set(state.lessons.map((lesson) => lesson.topic).filter((topic): topic is string => Boolean(topic)))].sort();
 
+  function selectLanguage(language: string) {
+    setLanguageFilter(language);
+    setLevelFilter("");
+  }
+
   return (
     <div>
       {header}
@@ -113,7 +118,7 @@ export function LessonLibrary() {
         {presentLanguages.length > 1 ? (
           <>
           <Pill
-            onClick={() => setLanguageFilter("")}
+            onClick={() => selectLanguage("")}
             selected={languageFilter === ""}
           >
             All languages
@@ -121,7 +126,7 @@ export function LessonLibrary() {
           {presentLanguages.map((language) => (
             <Pill
               key={language.code}
-              onClick={() => setLanguageFilter(language.code)}
+              onClick={() => selectLanguage(language.code)}
               selected={languageFilter === language.code}
               tone={language.tone}
             >

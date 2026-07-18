@@ -24,11 +24,16 @@ export type ReferenceResult<T> =
   | { ok: true; data: T[] }
   | { ok: false; message: string };
 
+type ReferencePage<T> = {
+  items: T[];
+  nextCursor?: string;
+};
+
 async function referencePage<T>(
   session: AuthSession,
   path: string,
   params: URLSearchParams,
-): Promise<ReferenceResult<T>> {
+): Promise<{ ok: true; data: ReferencePage<T> } | { ok: false; message: string }> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) {
     return { ok: false, message: "Langler API is not configured." };
@@ -40,11 +45,34 @@ async function referencePage<T>(
     if (!response.ok) {
       return { ok: false, message: `Reference data returned ${response.status}.` };
     }
-    const body = (await response.json()) as { items: T[] };
-    return { ok: true, data: body.items };
+    const body = (await response.json()) as ReferencePage<T>;
+    return { ok: true, data: body };
   } catch {
     return { ok: false, message: "Reference data is unavailable." };
   }
+}
+
+async function referenceCollection<T>(
+  session: AuthSession,
+  path: string,
+  params: URLSearchParams,
+): Promise<ReferenceResult<T>> {
+  const items: T[] = [];
+  const cursors = new Set<string>();
+  let cursor = "";
+  do {
+    const pageParams = new URLSearchParams(params);
+    if (cursor) pageParams.set("cursor", cursor);
+    const result = await referencePage<T>(session, path, pageParams);
+    if (!result.ok) return result;
+    items.push(...result.data.items);
+    cursor = result.data.nextCursor ?? "";
+    if (cursor && cursors.has(cursor)) {
+      return { ok: false, message: "Reference data pagination is invalid." };
+    }
+    if (cursor) cursors.add(cursor);
+  } while (cursor);
+  return { ok: true, data: items };
 }
 
 export function listVocabulary(
@@ -52,7 +80,7 @@ export function listVocabulary(
   language: string,
   level: string,
 ): Promise<ReferenceResult<VocabEntry>> {
-  return referencePage(session, "/reference/vocab", new URLSearchParams({
+  return referenceCollection(session, "/reference/vocab", new URLSearchParams({
     lang: language,
     level,
     limit: "200",
@@ -64,7 +92,7 @@ export function listScriptGlyphs(
   language: string,
   level: string,
 ): Promise<ReferenceResult<ScriptGlyph>> {
-  return referencePage(session, "/reference/scripts", new URLSearchParams({
+  return referenceCollection(session, "/reference/scripts", new URLSearchParams({
     lang: language,
     type: "kanji",
     level,

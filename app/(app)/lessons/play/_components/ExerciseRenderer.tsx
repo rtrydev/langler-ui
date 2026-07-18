@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { ClozeExercise } from "./ClozeExercise";
 import { MatchingExercise } from "./MatchingExercise";
 import { OrderingExercise } from "./OrderingExercise";
@@ -23,5 +24,5 @@ export function ExerciseRenderer({
     writing_prompt: <WritingExercise {...props} />,
     script_practice: <ScriptPracticeExercise {...props} language={language} level={level} />,
   };
-  return renderers[exercise.type] ?? <p>Unsupported exercise type: {exercise.type}</p>;
+  return <Fragment key={exercise.exerciseId}>{renderers[exercise.type] ?? <p>Unsupported exercise type: {exercise.type}</p>}</Fragment>;
 }

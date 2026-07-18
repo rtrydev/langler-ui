@@ -55,9 +55,9 @@ export function gradeReading(
   responses: Record<number, string>,
 ): ExerciseOutcome {
   const questions = exercise.payload?.questions ?? [];
-  const gradable = questions.filter((question) => question.answer);
+  const gradable = questions.filter((question) => question.answer?.trim());
   const correct = questions.filter((question, index) =>
-    question.answer && matchesAnswer(responses[index] ?? "", [question.answer]),
+    question.answer?.trim() && matchesAnswer(responses[index] ?? "", [question.answer]),
   ).length;
   return autoOutcome(exercise, correct, gradable.length);
 }

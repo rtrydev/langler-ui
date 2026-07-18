@@ -3,6 +3,7 @@ import {
   gradeCloze,
   gradeMatching,
   gradeOrdering,
+  gradeReading,
   matchesAnswer,
 } from "@/lib/lesson-grading";
 import type { LessonExercise } from "@/lib/api/lessons";
@@ -37,5 +38,21 @@ describe("lesson grading", () => {
       payload: { pairs: [{ left: "水", right: "water" }, { left: "火", right: "fire" }] },
     };
     expect(gradeMatching(matching, { 水: "water", 火: "heat" }).score).toBe(2);
+  });
+
+  it("excludes reading questions without a reference answer", () => {
+    const reading: LessonExercise = {
+      exerciseId: "reading-1",
+      type: "reading",
+      points: 8,
+      payload: {
+        questions: [
+          { question: "Where?", kind: "short_answer", answer: "Kyoto" },
+          { question: "Why?", kind: "short_answer", answer: "   " },
+        ],
+      },
+    };
+
+    expect(gradeReading(reading, { 0: "Kyoto", 1: "For fun" })).toEqual(expect.objectContaining({ correct: 1, total: 1, score: 8 }));
   });
 });
