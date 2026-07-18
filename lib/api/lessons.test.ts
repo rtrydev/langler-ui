@@ -193,5 +193,9 @@ describe("saveLessonResult", () => {
     const result = await saveLessonResult(session, "lesson", document);
     expect(result.ok).toBe(true);
     expect(request).toHaveBeenCalledWith("https://api.example.com/lessons/lesson/results", expect.objectContaining({ method: "POST" }));
+    expect(JSON.parse(String(request.mock.calls[0]?.[1]?.body))).toEqual({
+      ...document,
+      completedOn: "2026-07-18",
+    });
   });
 });
