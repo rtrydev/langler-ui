@@ -46,6 +46,7 @@ happens in app code, not here.
 | `Kbd` | monospace keyboard hint |
 | `Ruby` | furigana/romanization annotation |
 | `GlyphTile` | square script cell; guides, ghost, tracing, stroke index |
+| `DrawingPad` | pointer/touch canvas with optional tracing guide |
 
 Reuse before you build: widen one of these via props rather than adding a
 near-duplicate, and keep anything Langler-specific (labels, data, handlers)

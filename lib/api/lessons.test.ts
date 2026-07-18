@@ -4,6 +4,7 @@ import {
   generateLessonPrompt,
   importLesson,
   listLessons,
+  saveLessonResult,
 } from "@/lib/api/lessons";
 import type { AuthSession } from "@/lib/auth/cognito";
 
@@ -161,5 +162,29 @@ describe("deleteLesson", () => {
       "https://api.example.com/lessons/abc",
       expect.objectContaining({ method: "DELETE" }),
     );
+  });
+});
+
+describe("saveLessonResult", () => {
+  it("posts a raw per-exercise result for the authenticated user", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({ attemptId: "attempt", lessonId: "lesson" }), { status: 201 }));
+    vi.stubGlobal("fetch", request);
+    const document = {
+      attemptId: "11111111-1111-4111-8111-111111111111",
+      startedAt: "2026-07-18T12:00:00.000Z",
+      completedAt: "2026-07-18T12:01:00.000Z",
+      score: 8,
+      maxScore: 8,
+      autoScore: 8,
+      autoMax: 8,
+      selfScore: 0,
+      selfMax: 0,
+      exercises: [{ exerciseId: "ex-1", type: "cloze", grading: "auto" as const, score: 8, maxScore: 8, correct: 1, total: 1 }],
+    };
+
+    const result = await saveLessonResult(session, "lesson", document);
+    expect(result.ok).toBe(true);
+    expect(request).toHaveBeenCalledWith("https://api.example.com/lessons/lesson/results", expect.objectContaining({ method: "POST" }));
   });
 });

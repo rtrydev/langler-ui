@@ -25,6 +25,7 @@ The static client requires these public build-time variables:
 NEXT_PUBLIC_AWS_REGION=eu-central-1
 NEXT_PUBLIC_COGNITO_CLIENT_ID=...
 NEXT_PUBLIC_API_URL=https://....execute-api.eu-central-1.amazonaws.com
+NEXT_PUBLIC_REFERENCE_ASSETS_URL=https://....cloudfront.net
 ```
 
 The infrastructure deploy script obtains them from Terraform outputs. Authentication calls Cognito directly, handles the required first-login password change, rotates expired tokens, and keeps tokens only in memory. Reloading the page requires signing in again. The authenticated shell calls `GET /hello` through `lib/api/` with the Cognito access token.

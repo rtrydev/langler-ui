@@ -227,12 +227,22 @@ export function LessonDetailView() {
           : "Connected reading begins in a later lesson."}
       </p>
 
+      <Card className="mt-6 grid gap-2 sm:max-w-xs" elevation="card">
+        <Link href={`/lessons/play/?id=${lesson.lessonId}`}>
+          <Button fullWidth size="lg">Start lesson</Button>
+        </Link>
+        <Link href={`/lessons/print/?id=${lesson.lessonId}`}>
+          <Button fullWidth variant="secondary">Print worksheet</Button>
+        </Link>
+        <p className="text-center text-[11px] leading-relaxed text-ink-3">Choose whether to include a separate answer key in the print view.</p>
+      </Card>
+
       {deleteError ? (
         <Callout className="mt-6" tone="error">
           {deleteError}
         </Callout>
       ) : null}
-      <div className="mt-6">
+      <div className="mt-4">
         <Button
           disabled={deleting}
           onClick={() => void removeLesson()}
