@@ -20,9 +20,7 @@ const steps = [
 ];
 
 export default function ConnectPage() {
-  const machineApiUrl =
-    process.env.NEXT_PUBLIC_MACHINE_API_URL ??
-    "https://replace-with-your-langler-machine-api.invalid";
+  const machineApiUrl = process.env.NEXT_PUBLIC_MACHINE_API_URL;
   return (
     <div className="mx-auto max-w-3xl">
       <Heading as="h1" size="lg">Connect your agent</Heading>

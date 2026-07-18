@@ -5,6 +5,14 @@ export type HarnessAsset = {
   content: string;
 };
 
+function requireMachineApiUrl(value: string | undefined): string {
+  const url = value?.trim();
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_MACHINE_API_URL is required to generate the agent harness.");
+  }
+  return url;
+}
+
 function skill(machineApiUrl: string): string {
   return `# Langler lesson authoring
 
@@ -112,6 +120,7 @@ paths:
         '200': { description: Original lesson returned for a duplicate key }
         '400':
           description: Validation failed with path-specific issues.
+        '409': { description: Idempotency key was already used with different content }
 components:
   securitySchemes:
     machineToken:
@@ -330,11 +339,12 @@ function mcpConfig(machineApiUrl: string): string {
   );
 }
 
-export function harnessAssets(machineApiUrl: string): HarnessAsset[] {
+export function harnessAssets(machineApiUrl: string | undefined): HarnessAsset[] {
+  const url = requireMachineApiUrl(machineApiUrl);
   return [
-    { fileName: "SKILL.md", label: "Skill", mediaType: "text/markdown", content: skill(machineApiUrl) },
-    { fileName: "langler-openapi.yaml", label: "OpenAPI", mediaType: "application/yaml", content: openapi(machineApiUrl) },
+    { fileName: "SKILL.md", label: "Skill", mediaType: "text/markdown", content: skill(url) },
+    { fileName: "langler-openapi.yaml", label: "OpenAPI", mediaType: "application/yaml", content: openapi(url) },
     { fileName: "langler-mcp.mjs", label: "MCP server", mediaType: "text/javascript", content: mcpServer },
-    { fileName: "mcp.json", label: "MCP config", mediaType: "application/json", content: mcpConfig(machineApiUrl) },
+    { fileName: "mcp.json", label: "MCP config", mediaType: "application/json", content: mcpConfig(url) },
   ];
 }
