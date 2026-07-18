@@ -1,26 +1,187 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --paper: #faf7f2;
+  --surface: #ffffff;
+  --ink: #1f1d1a;
+  --ink-2: #6b6560;
+  --ink-3: #8a857e;
+  --line: #e7e0d6;
+  --line-2: #f0eae0;
+  --tint: #f1ebe1;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --accent: #2c4a9a;
+  --accent-hover: #213b7d;
+  --accent-soft: #eef1fa;
+  --accent-border: #b9c6e8;
+  --accent-strong: #33477e;
+  --on-accent: #ffffff;
+
+  --vermilion: #c7442e;
+  --vermilion-soft: #fbedea;
+  --vermilion-border: #e8c5bd;
+  --vermilion-strong: #8a3021;
+  --gold: #b8860b;
+  --gold-soft: #f6efdc;
+  --crimson: #9d2235;
+  --crimson-soft: #f7e9ec;
+
+  --success: #3f7a54;
+  --success-soft: #eaf2ec;
+  --success-border: #c9e1d0;
+  --warning: #b0791b;
+  --warning-soft: #fbf3e2;
+  --warning-border: #ead8ae;
+  --warning-strong: #7a5a13;
+
+  --selection: #d8e0f5;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --paper: #191715;
+    --surface: #221f1b;
+    --ink: #ede9e2;
+    --ink-2: #b3aca1;
+    --ink-3: #8a857e;
+    --line: #35322d;
+    --line-2: #2b2824;
+    --tint: #2b2824;
+
+    --accent: #7e93c9;
+    --accent-hover: #93a6d6;
+    --accent-soft: #28304a;
+    --accent-border: #3a4667;
+    --accent-strong: #afc0e8;
+    --on-accent: #191715;
+
+    --vermilion: #d9776a;
+    --vermilion-soft: #2e211f;
+    --vermilion-border: #4b322c;
+    --vermilion-strong: #e5a79c;
+    --gold: #d3a54a;
+    --gold-soft: #2c2517;
+    --crimson: #c56b80;
+    --crimson-soft: #2c1e23;
+
+    --success: #7fb58f;
+    --success-soft: #1f2b22;
+    --success-border: #34493a;
+    --warning: #d3a54a;
+    --warning-soft: #2c2517;
+    --warning-border: #4a3d20;
+    --warning-strong: #e0c08a;
+
+    --selection: #3a4667;
   }
 }
 
+:root[data-theme="dark"] {
+  --paper: #191715;
+  --surface: #221f1b;
+  --ink: #ede9e2;
+  --ink-2: #b3aca1;
+  --ink-3: #8a857e;
+  --line: #35322d;
+  --line-2: #2b2824;
+  --tint: #2b2824;
+
+  --accent: #7e93c9;
+  --accent-hover: #93a6d6;
+  --accent-soft: #28304a;
+  --accent-border: #3a4667;
+  --accent-strong: #afc0e8;
+  --on-accent: #191715;
+
+  --vermilion: #d9776a;
+  --vermilion-soft: #2e211f;
+  --vermilion-border: #4b322c;
+  --vermilion-strong: #e5a79c;
+  --gold: #d3a54a;
+  --gold-soft: #2c2517;
+  --crimson: #c56b80;
+  --crimson-soft: #2c1e23;
+
+  --success: #7fb58f;
+  --success-soft: #1f2b22;
+  --success-border: #34493a;
+  --warning: #d3a54a;
+  --warning-soft: #2c2517;
+  --warning-border: #4a3d20;
+  --warning-strong: #e0c08a;
+
+  --selection: #3a4667;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-tint: var(--tint);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-border: var(--accent-border);
+  --color-accent-strong: var(--accent-strong);
+  --color-on-accent: var(--on-accent);
+
+  --color-vermilion: var(--vermilion);
+  --color-vermilion-soft: var(--vermilion-soft);
+  --color-vermilion-border: var(--vermilion-border);
+  --color-vermilion-strong: var(--vermilion-strong);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-crimson: var(--crimson);
+  --color-crimson-soft: var(--crimson-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
+  --color-warning-strong: var(--warning-strong);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-serif: var(--font-noto-serif), Georgia, serif;
+  --font-jp: var(--font-noto-sans-jp), sans-serif;
+  --font-jp-serif: var(--font-noto-serif-jp), serif;
+  --font-myanmar: var(--font-noto-sans-myanmar), sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  --shadow-card: 0 1px 2px rgb(31 29 26 / 0.04);
+  --shadow-raised: 0 8px 30px -8px rgb(31 29 26 / 0.28);
+  --shadow-floating: 0 18px 40px -18px rgb(31 29 26 / 0.28);
+  --shadow-window: 0 1px 2px rgb(31 29 26 / 0.04),
+    0 22px 46px -26px rgb(31 29 26 / 0.22);
+}
+
+@utility glyph-guides {
+  background-image: linear-gradient(var(--line-2), var(--line-2)),
+    linear-gradient(var(--line-2), var(--line-2));
+  background-size: 1px 100%, 100% 1px;
+  background-position: center, center;
+  background-repeat: no-repeat;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--selection);
+}
+
+ruby rt {
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-2);
 }
