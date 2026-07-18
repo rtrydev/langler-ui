@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { AuthSession } from "@/lib/auth/cognito";
 import { getDueReviews, getProgressSummary, gradeReview } from "./progress";
 
@@ -9,8 +9,14 @@ const session: AuthSession = {
 };
 
 afterEach(() => {
+	vi.useRealTimers();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+});
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date(2026, 6, 19, 12));
 });
 
 describe("progress API", () => {
@@ -25,7 +31,7 @@ describe("progress API", () => {
       ok: true,
       data: [],
     });
-    expect(request).toHaveBeenCalledWith("https://api.example.com/progress", {
+    expect(request).toHaveBeenCalledWith("https://api.example.com/progress?date=2026-07-19", {
       headers: { Authorization: "Bearer access-token" },
     });
   });
@@ -39,7 +45,7 @@ describe("progress API", () => {
 
     await getDueReviews(session, "ja");
     expect(request).toHaveBeenCalledWith(
-      "https://api.example.com/reviews/due?language=ja",
+      "https://api.example.com/reviews/due?date=2026-07-19&language=ja",
       { headers: { Authorization: "Bearer access-token" } },
     );
   });
@@ -73,6 +79,7 @@ describe("progress API", () => {
       kind: "vocab",
       itemId: item.itemId,
       grade: "good",
+		reviewedOn: "2026-07-19",
     });
   });
 });

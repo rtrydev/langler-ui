@@ -5,6 +5,7 @@ import {
   reviewGradeSchema,
   type ReviewGradeInput,
 } from "@/lib/validation/progress";
+import { studyDate } from "@/lib/study-date";
 
 export type ProgressApiError = {
   kind: "configuration" | "network" | "response" | "validation";
@@ -91,7 +92,7 @@ export async function getProgressSummary(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/progress`, {
+    const response = await fetch(`${apiUrl}/progress?date=${studyDate()}`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     });
     if (!response.ok) {
@@ -112,11 +113,10 @@ export async function getDueReviews(
   if (!apiUrl) {
     return { ok: false, error: missingConfig };
   }
-  const query = language
-    ? `?language=${encodeURIComponent(language)}`
-    : "";
+  const query = new URLSearchParams({ date: studyDate() });
+  if (language) query.set("language", language);
   try {
-    const response = await fetch(`${apiUrl}/reviews/due${query}`, {
+    const response = await fetch(`${apiUrl}/reviews/due?${query}`, {
       headers: { Authorization: `Bearer ${session.accessToken}` },
     });
     if (!response.ok) {
@@ -151,7 +151,7 @@ export async function gradeReview(
         Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(parsed.data),
+      body: JSON.stringify({ ...parsed.data, reviewedOn: studyDate() }),
     });
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };

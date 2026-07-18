@@ -1,6 +1,7 @@
 import "client-only";
 
 import type { AuthSession } from "@/lib/auth/cognito";
+import { studyDate } from "@/lib/study-date";
 
 export type LessonIssue = {
   path: string;
@@ -337,7 +338,10 @@ export async function saveLessonResult(
           Authorization: `Bearer ${session.accessToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(result),
+        body: JSON.stringify({
+          ...result,
+          completedOn: studyDate(new Date(result.completedAt)),
+        }),
       },
     );
     if (!response.ok) {

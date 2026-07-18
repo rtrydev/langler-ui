@@ -9,18 +9,20 @@ import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Heading } from "@/components/ui/Heading";
+import { Kbd } from "@/components/ui/Kbd";
+import { StatusCircle } from "@/components/ui/StatusCircle";
 import {
   getDueReviews,
   gradeReview,
-  type ReviewItem,
 } from "@/lib/api/progress";
 import { languageOption } from "@/lib/lesson-catalog";
+import { reviewQueue, type QueuedReviewItem } from "@/lib/review-queue";
 import type { ReviewGradeInput } from "@/lib/validation/progress";
 
 type ReviewState =
   | { kind: "loading" }
   | { kind: "error"; message: string }
-  | { kind: "ready"; language: string; items: ReviewItem[]; total: number };
+  | { kind: "ready"; items: QueuedReviewItem[]; total: number };
 
 const GRADES: Array<{
   grade: ReviewGradeInput["grade"];
@@ -66,10 +68,8 @@ export function ReviewSession() {
         setState({ kind: "error", message: result.error.message });
         return;
       }
-      const group = result.data.find((entry) => entry.items.length > 0);
-      const language = group?.language ?? requestedLanguage ?? result.data[0]?.language ?? "ja";
-      const items = group?.items ?? [];
-      setState({ kind: "ready", language, items, total: items.length });
+      const items = reviewQueue(result.data);
+      setState({ kind: "ready", items, total: items.length });
     });
     return () => {
       active = false;
@@ -99,7 +99,7 @@ export function ReviewSession() {
     setSubmitting(true);
     setMessage("");
     const result = await gradeReview(session, {
-      language: state.language as ReviewGradeInput["language"],
+      language: item.language as ReviewGradeInput["language"],
       kind: item.kind,
       itemId: item.itemId,
       grade,
@@ -134,14 +134,14 @@ export function ReviewSession() {
     );
   }
 
-  const language = languageOption(state.language);
   const item = state.items[0];
+  const language = item ? languageOption(item.language) : undefined;
   if (!item && reviewed === 0) {
     return (
       <div className="mx-auto max-w-xl">
         <EmptyState
           description="You're all caught up. Come back tomorrow — new items will be waiting."
-          icon={<span className="text-success">✓</span>}
+          icon={<StatusCircle size="lg" tone="success">✓</StatusCircle>}
           title="Nothing due"
         >
           <Link href="/">
@@ -155,9 +155,7 @@ export function ReviewSession() {
   if (!item) {
     return (
       <Card className="mx-auto max-w-md text-center" padding="lg">
-        <div className="mx-auto mb-4 grid size-11 place-items-center rounded-full bg-success-soft text-xl text-success">
-          ✓
-        </div>
+        <StatusCircle className="mx-auto mb-4" size="lg" tone="success">✓</StatusCircle>
         <Heading as="h1" size="sm">
           Session complete
         </Heading>
@@ -192,7 +190,7 @@ export function ReviewSession() {
           ×
         </Link>
         <span className="rounded-[5px] bg-accent-soft px-2 py-1 text-[11px] font-semibold text-accent">
-          {language?.nativeName ?? state.language}
+          {language?.nativeName ?? item.language}
         </span>
         <span className="ml-auto text-xs text-ink-3">
           {state.items.length} left today
@@ -211,7 +209,7 @@ export function ReviewSession() {
             <Button onClick={() => setRevealed(true)} size="lg">
               Reveal
             </Button>
-            <p className="mt-3 font-mono text-[11px] text-ink-3">Space to reveal</p>
+            <p className="mt-3 text-[11px] text-ink-3"><Kbd>Space</Kbd> to reveal</p>
           </div>
         ) : (
           <div className="mt-5">
@@ -237,12 +235,12 @@ export function ReviewSession() {
       <div className="grid min-h-[61px] grid-cols-4 border-t border-line">
         {revealed
           ? GRADES.map((option) => (
-              <button
-                className="border-r border-line-2 px-1 py-3 font-sans transition-colors last:border-r-0 hover:bg-tint focus-visible:outline-2 focus-visible:outline-accent disabled:opacity-50"
+              <Button
+                className="h-full w-full flex-col rounded-none border-r border-line-2 px-1 py-3 last:border-r-0"
                 disabled={submitting}
                 key={option.grade}
                 onClick={() => void submitGrade(option.grade)}
-                type="button"
+                variant="ghost"
               >
                 <span className={`block text-sm font-semibold ${option.color}`}>
                   {option.label}
@@ -250,7 +248,7 @@ export function ReviewSession() {
                 <span className="mt-0.5 block font-mono text-[10px] text-ink-3">
                   {option.key}
                 </span>
-              </button>
+              </Button>
             ))
           : null}
       </div>

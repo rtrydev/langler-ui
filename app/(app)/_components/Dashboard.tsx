@@ -8,6 +8,7 @@ import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { Overline } from "@/components/ui/Overline";
+import { StatusDot } from "@/components/ui/StatusDot";
 import {
   getProgressSummary,
   type LanguageProgress,
@@ -30,14 +31,6 @@ function longDate(): string {
 function lessonScore(score: number, maximum: number): string {
   if (maximum === 0) return "Recorded";
   return `${Math.round((score / maximum) * 100)}%`;
-}
-
-function toneDot(tone: "vermilion" | "gold" | "crimson"): string {
-  return {
-    vermilion: "bg-vermilion",
-    gold: "bg-gold",
-    crimson: "bg-crimson",
-  }[tone];
 }
 
 export function Dashboard() {
@@ -199,10 +192,7 @@ export function Dashboard() {
           return (
             <Card key={progress.language}>
               <p className="text-sm font-bold text-ink">
-                <span
-                  aria-hidden
-                  className={`mr-2 inline-block size-2 rounded-full ${toneDot(language.tone)}`}
-                />
+                <StatusDot className="mr-2" tone={language.tone} />
                 {language.nativeName}
               </p>
               <div className="mt-4 flex gap-6 border-t border-line-2 pt-3">
