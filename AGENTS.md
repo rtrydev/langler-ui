@@ -70,14 +70,14 @@ Before adding a primitive, check whether the design already has a name for it. P
 - No hacks or workarounds. Build the clean, well-formed solution that will last; if the clean path is blocked, stop and explain the blocker instead of patching around it.
 - The React Compiler handles memoisation. Do not add `useMemo`, `useCallback`, or `React.memo`. If a render is genuinely slow, say so and we will measure before optimising.
 - No new runtime dependencies without asking first. Dev dependencies are fine.
-- Components: named exports, one component per file, `PascalCase.tsx`. Everything else `kebab-case.ts`.
+- Components: named exports, one component per file, `PascalCase.tsx`. Colocated component tests use `PascalCase.test.tsx`; everything else uses `kebab-case.ts`.
 - Async server components are the norm — `export default async function Page()` is not a smell.
 - Every route segment that fetches gets a `loading.tsx`. Every route group gets an `error.tsx`.
 - Accessibility is not optional: semantic elements, labelled controls, visible focus. Prefer a real `<button>` over a `<div onClick>`.
 
 ## Testing
 
-- Unit tests sit next to the code as `*.test.ts`.
+- Unit tests sit next to the code as `*.test.ts`, or `*.test.tsx` when the test contains JSX.
 - Test the functions in `lib/`, not the framework. Do not write tests that assert Next.js renders a page.
 - Server Actions are tested directly as functions with mocked `lib/api/` clients.
 - Add a test when fixing a bug; the test should fail against the unfixed code.
