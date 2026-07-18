@@ -8,6 +8,8 @@ describe("Input", () => {
     const el = screen.getByPlaceholderText("Email");
     expect(el.className).toContain("border-line");
     expect(el.getAttribute("aria-invalid")).toBeNull();
+    expect(el.className).toContain("text-base");
+    expect(el.className).toContain("sm:text-sm");
   });
 
   it("marks invalid fields for styling and assistive tech", () => {

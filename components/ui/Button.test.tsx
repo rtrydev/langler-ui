@@ -31,6 +31,12 @@ describe("Button", () => {
     expect(el.className).toContain("px-6");
   });
 
+  it("supports link-styled actions without inventing an anchor destination", () => {
+    render(<Button variant="link">Forgot password?</Button>);
+    expect(screen.getByRole("button").className).toContain("text-accent");
+    expect(screen.getByRole("button").className).toContain("bg-transparent");
+  });
+
   it("stretches to full width when fullWidth is set", () => {
     render(<Button fullWidth>W</Button>);
     expect(screen.getByRole("button").className).toContain("w-full");

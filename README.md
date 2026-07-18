@@ -19,6 +19,16 @@ npm run build   # outputs to out/
 
 Deployment (S3 sync with split cache headers + CloudFront invalidation) is driven from `langler-tf-infrastructure`.
 
+The static client requires these public build-time variables:
+
+```sh
+NEXT_PUBLIC_AWS_REGION=eu-central-1
+NEXT_PUBLIC_COGNITO_CLIENT_ID=...
+NEXT_PUBLIC_API_URL=https://....execute-api.eu-central-1.amazonaws.com
+```
+
+The infrastructure deploy script obtains them from Terraform outputs. Authentication calls Cognito directly, handles the required first-login password change, rotates expired tokens, and keeps tokens only in memory. Reloading the page requires signing in again. The authenticated shell calls `GET /hello` through `lib/api/` with the Cognito access token.
+
 ## Constraints of static export
 
 - No SSR/middleware/server actions; entity pages (e.g. lessons) use query params / client-side routing, not per-ID pre-rendering.

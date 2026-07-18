@@ -7,7 +7,8 @@ export type ButtonVariant =
   | "accent"
   | "ghost"
   | "danger"
-  | "contrast";
+  | "contrast"
+  | "link";
 
 export type ButtonSize = "sm" | "md" | "lg";
 
@@ -19,6 +20,7 @@ const variantClasses: Record<ButtonVariant, string> = {
   ghost: "bg-transparent text-ink-2 hover:bg-tint",
   danger: "bg-transparent text-crimson hover:bg-crimson-soft",
   contrast: "bg-ink text-paper hover:opacity-90",
+  link: "bg-transparent text-accent hover:text-accent-hover",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
