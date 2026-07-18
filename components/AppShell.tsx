@@ -1,63 +1,150 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
-import { getHello, type HelloResponse } from "@/lib/api/hello";
-import { clearSession, type AuthSession } from "@/lib/auth/cognito";
+import { clearSession } from "@/lib/auth/cognito";
+import { cn } from "@/lib/cn";
 
-type AppShellProps = { session: AuthSession; onSignOut: () => void };
+type AppShellProps = { onSignOut: () => void; children: ReactNode };
 
-export function AppShell({ session, onSignOut }: AppShellProps) {
-  const [hello, setHello] = useState<HelloResponse | null>(null);
-  const [error, setError] = useState("");
+const NAV_ITEMS = [
+  { href: "/", label: "Home", icon: "M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10" },
+  {
+    href: "/lessons/",
+    label: "Lessons",
+    icon: "M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2zM5 4v14",
+  },
+  {
+    href: "/create/",
+    label: "Create",
+    icon: "M4 20l1-4L16 5l3 3L8 19zM14 7l3 3",
+  },
+];
 
-  useEffect(() => {
-    let active = true;
-    getHello(session).then((result) => {
-      if (!active) return;
-      if (result.ok) {
-        setHello(result.data);
-      } else {
-        setError(result.error.message);
-      }
-    });
-    return () => { active = false; };
-  }, [session]);
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/") {
+    return pathname === "/";
+  }
+  return pathname.startsWith(href.replace(/\/$/, ""));
+}
+
+function NavIcon({ path, active }: { path: string; active: boolean }) {
+  return (
+    <svg
+      aria-hidden
+      className={active ? "stroke-accent" : "stroke-ink-2"}
+      fill="none"
+      height="19"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="1.7"
+      viewBox="0 0 24 24"
+      width="19"
+    >
+      <path d={path} />
+    </svg>
+  );
+}
+
+function Wordmark() {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span
+        aria-hidden
+        className="grid size-7 place-items-center rounded-[7px] bg-accent font-serif text-[15px] font-bold text-on-accent"
+      >
+        語
+      </span>
+      <span className="text-lg font-bold tracking-tight text-ink">Langler</span>
+    </span>
+  );
+}
+
+export function AppShell({ onSignOut, children }: AppShellProps) {
+  const pathname = usePathname();
 
   function signOut() {
     clearSession();
     onSignOut();
   }
 
-  const status = hello ? "Connected" : error ? "Unavailable" : "Checking…";
-  const statusClass = hello ? "bg-success-soft text-success" : error ? "bg-vermilion-soft text-vermilion-strong" : "bg-tint text-ink-2";
-
   return (
-    <div className="min-h-screen bg-paper">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <span className="font-serif text-xl font-semibold tracking-tight">Langler</span>
-          <Button onClick={signOut} variant="secondary">Sign out</Button>
+    <div className="min-h-screen bg-paper md:flex">
+      <nav
+        aria-label="Primary"
+        className="hidden w-[236px] shrink-0 flex-col border-r border-line bg-surface px-4 py-[22px] md:flex"
+      >
+        <div className="px-2.5 pb-[22px]">
+          <Wordmark />
         </div>
-      </header>
-      <main className="mx-auto grid max-w-5xl gap-8 px-6 py-12">
-        <div>
-          <p className="mb-2 font-mono text-xs uppercase tracking-[0.18em] text-accent-strong">Foundation online</p>
-          <h1 className="font-serif text-4xl font-semibold tracking-tight">Your language notebook</h1>
-          <p className="mt-3 max-w-2xl text-ink-2">The secure shell is ready. Lessons and study tools arrive in the next build.</p>
+        <div className="flex flex-col gap-0.5">
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-[9px] text-sm",
+                  active
+                    ? "bg-accent-soft font-semibold text-accent"
+                    : "font-medium text-ink hover:bg-tint",
+                )}
+                href={item.href}
+                key={item.href}
+              >
+                <NavIcon active={active} path={item.icon} />
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
-        <section className="rounded-lg border border-line bg-surface p-6 shadow-card" aria-labelledby="api-status">
-          <div className="flex items-start justify-between gap-6">
-            <div>
-              <h2 className="font-serif text-xl font-semibold" id="api-status">Authenticated API</h2>
-              <p className="mt-1 text-sm text-ink-2">Cognito JWT → HTTP API → Go Lambda</p>
-            </div>
-            <span className={`rounded-full px-3 py-1 font-mono text-xs ${statusClass}`}>{status}</span>
-          </div>
-          {hello ? <p className="mt-6 rounded-md bg-tint px-4 py-3 font-mono text-sm">{hello.message} · {hello.service} · {hello.stage}</p> : null}
-          {error ? <p className="mt-6 text-sm text-vermilion-strong" role="alert">{error}</p> : null}
-        </section>
-      </main>
+        <div className="flex-1" />
+        <div className="mt-2 border-t border-line pt-3">
+          <Button fullWidth onClick={signOut} variant="ghost">
+            Sign out
+          </Button>
+        </div>
+      </nav>
+
+      <div className="flex min-h-screen flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-line bg-surface px-5 py-3 md:hidden">
+          <Wordmark />
+          <Button onClick={signOut} size="sm" variant="ghost">
+            Sign out
+          </Button>
+        </header>
+
+        <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-8 pb-24 md:px-11 md:pb-8">
+          {children}
+        </main>
+
+        <nav
+          aria-label="Primary"
+          className="fixed inset-x-0 bottom-0 flex h-16 items-stretch justify-around border-t border-line bg-surface/95 pb-1.5 backdrop-blur md:hidden"
+        >
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(pathname, item.href);
+            return (
+              <Link
+                className="flex flex-1 flex-col items-center justify-center gap-1 pt-2"
+                href={item.href}
+                key={item.href}
+              >
+                <NavIcon active={active} path={item.icon} />
+                <span
+                  className={cn(
+                    "text-[10.5px]",
+                    active ? "font-semibold text-accent" : "font-medium text-ink-3",
+                  )}
+                >
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+      </div>
     </div>
   );
 }

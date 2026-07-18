@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AppShell } from "@/components/AppShell";
 import { AuthBrand } from "@/components/AuthBrand";
+import { SessionProvider } from "@/components/SessionContext";
 import { ForgotPasswordForm } from "@/components/ForgotPasswordForm";
 import { NewPasswordForm } from "@/components/NewPasswordForm";
 import { SignInForm } from "@/components/SignInForm";
@@ -23,7 +24,7 @@ type GateState =
   | { kind: "new-password"; challenge: PasswordChallenge }
   | { kind: "authenticated"; session: AuthSession };
 
-export function AuthGate() {
+export function AuthGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<GateState>({ kind: "loading" });
 
   useEffect(() => {
@@ -54,10 +55,11 @@ export function AuthGate() {
 
   if (state.kind === "authenticated") {
     return (
-      <AppShell
-        onSignOut={() => setState({ kind: "signed-out" })}
-        session={state.session}
-      />
+      <SessionProvider session={state.session}>
+        <AppShell onSignOut={() => setState({ kind: "signed-out" })}>
+          {children}
+        </AppShell>
+      </SessionProvider>
     );
   }
 
