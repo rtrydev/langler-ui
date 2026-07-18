@@ -107,17 +107,24 @@ describe("importLesson", () => {
       createdAt: "2026-07-18T12:00:00Z",
       created: true,
     };
-    vi.stubGlobal(
-      "fetch",
-      vi
-        .fn()
-        .mockResolvedValue(
-          new Response(JSON.stringify(summary), { status: 201 }),
-        ),
-    );
+    const request = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify(summary), { status: 201 }));
+    vi.stubGlobal("fetch", request);
 
-    const result = await importLesson(session, { schemaVersion: "1.0" });
+    const result = await importLesson(session, {
+      schemaVersion: "1.0",
+      lessonId: summary.lessonId,
+    });
     expect(result).toEqual({ ok: true, data: summary });
+    expect(request).toHaveBeenCalledWith(
+      "https://api.example.com/lessons/import",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "Idempotency-Key": `lesson-${summary.lessonId}`,
+        }),
+      }),
+    );
   });
 
   it("maps a network failure to a typed error", async () => {

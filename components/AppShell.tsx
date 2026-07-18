@@ -21,6 +21,11 @@ const NAV_ITEMS = [
     label: "Create",
     icon: "M4 20l1-4L16 5l3 3L8 19zM14 7l3 3",
   },
+  {
+    href: "/settings/",
+    label: "Settings",
+    icon: "M4 8h16M4 16h16M9 8V6m0 4V8m6 8v2m0-6v6",
+  },
 ];
 
 function isActive(pathname: string, href: string): boolean {

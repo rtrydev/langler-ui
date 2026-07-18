@@ -228,11 +228,16 @@ export async function importLesson(
     return { ok: false, error: missingConfig };
   }
   try {
+	const idempotencyKey =
+		typeof document.lessonId === "string"
+			? `lesson-${document.lessonId}`
+			: `lesson-${crypto.randomUUID()}`;
     const response = await fetch(`${apiUrl}/lessons/import`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
+		"Idempotency-Key": idempotencyKey,
       },
       body: JSON.stringify(document),
     });
