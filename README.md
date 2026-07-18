@@ -25,6 +25,7 @@ The static client requires these public build-time variables:
 NEXT_PUBLIC_AWS_REGION=eu-central-1
 NEXT_PUBLIC_COGNITO_CLIENT_ID=...
 NEXT_PUBLIC_API_URL=https://....execute-api.eu-central-1.amazonaws.com
+NEXT_PUBLIC_MACHINE_API_URL=https://....execute-api.eu-central-1.amazonaws.com
 NEXT_PUBLIC_REFERENCE_ASSETS_URL=https://....cloudfront.net
 ```
 
