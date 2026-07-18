@@ -13,9 +13,14 @@ export function AppShell({ session, onSignOut }: AppShellProps) {
 
   useEffect(() => {
     let active = true;
-    getHello(session)
-      .then((response) => { if (active) setHello(response); })
-      .catch((cause: unknown) => { if (active) setError(cause instanceof Error ? cause.message : "The API is unavailable."); });
+    getHello(session).then((result) => {
+      if (!active) return;
+      if (result.ok) {
+        setHello(result.data);
+      } else {
+        setError(result.error.message);
+      }
+    });
     return () => { active = false; };
   }, [session]);
 

@@ -51,16 +51,16 @@ Before adding a primitive, check whether the design already has a name for it. P
 ## Server and client boundary
 
 - Push `use client` as far down the tree as possible. A page should not be a client component because one button inside it is. Primitives in `components/ui/` should be server-compatible unless they genuinely need interactivity.
-- Never fetch data in a Client Component. Fetch on the server and pass the result as props, or stream it in through `<Suspense>`.
+- Fetch build-time public data in Server Components. Runtime data that depends on the in-memory Cognito session must be fetched from a Client Component through a typed function in `lib/api/`; this is the static-export exception, because there is no request-time server.
 - Import `server-only` at the top of any module that touches secrets, and `client-only` in modules that touch `window`. A leaked API key is a build failure we want, not a review catch.
 - Only `NEXT_PUBLIC_`-prefixed env vars may be referenced in client code. Everything else is server-side.
 
 ## Data and mutations
 
 - All reads go through a typed function in `lib/api/`. Components never call `fetch` directly and never hardcode a URL.
-- All writes go through Server Actions. Do not add a route handler in `app/api/` to serve the app's own forms.
-- Every Server Action validates its input with a Zod schema from `lib/validation/` before doing anything else. Arguments arrive from the network and are untrusted regardless of what the calling form does.
-- After a mutation, invalidate the affected `cacheTag` rather than revalidating a path.
+- Server Actions are unavailable under `output: "export"`; do not add one or a route handler for the app's own forms. Runtime Langler API writes go through typed functions in `lib/api/`, and Cognito authentication calls stay in `lib/auth/`.
+- Validate mutation input with a Zod schema from `lib/validation/` before sending it. Form values are untrusted regardless of what the controls enforce.
+- After a mutation, refresh the affected client state explicitly. There is no request-time Next.js cache to invalidate in the static export.
 - Errors from the API surface as typed results, not thrown strings. Let `error.tsx` handle the unexpected; handle the expected inline.
 
 ## Conventions
@@ -72,7 +72,7 @@ Before adding a primitive, check whether the design already has a name for it. P
 - No new runtime dependencies without asking first. Dev dependencies are fine.
 - Components: named exports, one component per file, `PascalCase.tsx`. Colocated component tests use `PascalCase.test.tsx`; everything else uses `kebab-case.ts`.
 - Async server components are the norm — `export default async function Page()` is not a smell.
-- Every route segment that fetches gets a `loading.tsx`. Every route group gets an `error.tsx`.
+- Every route segment with build-time server fetching gets a `loading.tsx`. Client-side runtime fetching must expose an inline loading state. Every route group gets an `error.tsx`.
 - Accessibility is not optional: semantic elements, labelled controls, visible focus. Prefer a real `<button>` over a `<div onClick>`.
 
 ## Testing

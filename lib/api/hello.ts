@@ -8,21 +8,55 @@ export type HelloResponse = {
   stage: string;
 };
 
+export type HelloResult =
+  | { ok: true; data: HelloResponse }
+  | {
+      ok: false;
+      error: {
+        kind: "configuration" | "network" | "response";
+        message: string;
+        status?: number;
+      };
+    };
+
 export async function getHello(
   session: AuthSession,
-): Promise<HelloResponse> {
+): Promise<HelloResult> {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   if (!apiUrl) {
-    throw new Error("Langler API is not configured.");
+    return {
+      ok: false,
+      error: {
+        kind: "configuration",
+        message: "Langler API is not configured.",
+      },
+    };
   }
 
-  const response = await fetch(`${apiUrl}/hello`, {
-    headers: { Authorization: `Bearer ${session.accessToken}` },
-  });
+  try {
+    const response = await fetch(`${apiUrl}/hello`, {
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    });
 
-  if (!response.ok) {
-    throw new Error(`The Langler API returned ${response.status}.`);
+    if (!response.ok) {
+      return {
+        ok: false,
+        error: {
+          kind: "response",
+          message: `The Langler API returned ${response.status}.`,
+          status: response.status,
+        },
+      };
+    }
+
+    return { ok: true, data: (await response.json()) as HelloResponse };
+  } catch {
+    return {
+      ok: false,
+      error: {
+        kind: "network",
+        message: "The Langler API is unavailable.",
+      },
+    };
   }
-
-  return (await response.json()) as HelloResponse;
 }
