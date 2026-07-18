@@ -62,7 +62,12 @@ export type LessonSummary = {
   createdAt: string;
 };
 
-export type ClozeBlank = { index: number; answer: string; hint?: string };
+export type ClozeBlank = {
+  index: number;
+  answer: string;
+  alternates?: string[];
+  hint?: string;
+};
 
 export type ExercisePayload = {
   text?: string;
@@ -121,6 +126,35 @@ export type DetailResult =
   | { ok: false; error: LessonApiError };
 
 export type DeleteResult = { ok: true } | { ok: false; error: LessonApiError };
+
+export type ExerciseOutcome = {
+  exerciseId: string;
+  type: string;
+  grading: "auto" | "self";
+  score: number;
+  maxScore: number;
+  correct: number;
+  total: number;
+};
+
+export type LessonResultDocument = {
+  attemptId: string;
+  startedAt: string;
+  completedAt: string;
+  score: number;
+  maxScore: number;
+  autoScore: number;
+  autoMax: number;
+  selfScore: number;
+  selfMax: number;
+  exercises: ExerciseOutcome[];
+};
+
+export type SavedLessonResult = { attemptId: string; lessonId: string };
+
+export type SaveResult =
+  | { ok: true; data: SavedLessonResult }
+  | { ok: false; error: LessonApiError };
 
 const missingConfig: LessonApiError = {
   kind: "configuration",
@@ -275,6 +309,36 @@ export async function deleteLesson(
       return { ok: false, error: (await responseError(response)).error };
     }
     return { ok: true };
+  } catch {
+    return { ok: false, error: unavailable };
+  }
+}
+
+export async function saveLessonResult(
+  session: AuthSession,
+  lessonId: string,
+  result: LessonResultDocument,
+): Promise<SaveResult> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    return { ok: false, error: missingConfig };
+  }
+  try {
+    const response = await fetch(
+      `${apiUrl}/lessons/${encodeURIComponent(lessonId)}/results`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${session.accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(result),
+      },
+    );
+    if (!response.ok) {
+      return { ok: false, error: (await responseError(response)).error };
+    }
+    return { ok: true, data: (await response.json()) as SavedLessonResult };
   } catch {
     return { ok: false, error: unavailable };
   }

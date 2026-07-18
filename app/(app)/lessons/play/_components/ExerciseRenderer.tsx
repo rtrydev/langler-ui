@@ -1,0 +1,27 @@
+import { ClozeExercise } from "./ClozeExercise";
+import { MatchingExercise } from "./MatchingExercise";
+import { OrderingExercise } from "./OrderingExercise";
+import { ReadingExercise } from "./ReadingExercise";
+import { ScriptPracticeExercise } from "./ScriptPracticeExercise";
+import { TranslationExercise } from "./TranslationExercise";
+import type { ExercisePlayerProps } from "./types";
+import { WritingExercise } from "./WritingExercise";
+
+export function ExerciseRenderer({
+  exercise,
+  language,
+  level,
+  onComplete,
+}: ExercisePlayerProps & { language: string; level: string }) {
+  const props = { exercise, onComplete };
+  const renderers: Record<string, React.ReactNode> = {
+    cloze: <ClozeExercise {...props} />,
+    translation: <TranslationExercise {...props} />,
+    ordering: <OrderingExercise {...props} />,
+    matching: <MatchingExercise {...props} />,
+    reading: <ReadingExercise {...props} language={language} level={level} />,
+    writing_prompt: <WritingExercise {...props} />,
+    script_practice: <ScriptPracticeExercise {...props} language={language} level={level} />,
+  };
+  return renderers[exercise.type] ?? <p>Unsupported exercise type: {exercise.type}</p>;
+}
