@@ -9,11 +9,12 @@ import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
 import { Overline } from "@/components/ui/Overline";
 import { StatusDot } from "@/components/ui/StatusDot";
+import { getProfileLevels, type ProfileLevel } from "@/lib/api/assessments";
 import {
   getProgressSummary,
   type LanguageProgress,
 } from "@/lib/api/progress";
-import { languageOption } from "@/lib/lesson-catalog";
+import { languageOption, levelLabel } from "@/lib/lesson-catalog";
 
 type DashboardState =
   | { kind: "loading" }
@@ -36,6 +37,7 @@ function lessonScore(score: number, maximum: number): string {
 export function Dashboard() {
   const session = useSession();
   const [state, setState] = useState<DashboardState>({ kind: "loading" });
+  const [levels, setLevels] = useState<ProfileLevel[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -46,6 +48,9 @@ export function Dashboard() {
           ? { kind: "ready", languages: result.data }
           : { kind: "error", message: result.error.message },
       );
+    });
+    getProfileLevels(session).then((result) => {
+      if (active && result.ok) setLevels(result.data);
     });
     return () => {
       active = false;
@@ -189,12 +194,39 @@ export function Dashboard() {
         {state.languages.map((progress) => {
           const language = languageOption(progress.language);
           if (!language) return null;
+          const estimate = levels.find(
+            (level) => level.language === progress.language,
+          );
           return (
             <Card key={progress.language}>
               <p className="text-sm font-bold text-ink">
                 <StatusDot className="mr-2" tone={language.tone} />
                 {language.nativeName}
               </p>
+              {estimate ? (
+                <p className="mt-2 text-[13px] text-ink-2">
+                  <strong className="text-ink">
+                    {levelLabel(progress.language, estimate.level)}
+                  </strong>{" "}
+                  <span className="text-[11px] text-ink-3">
+                    estimated · placement{" "}
+                    {new Intl.DateTimeFormat(undefined, {
+                      day: "numeric",
+                      month: "short",
+                    }).format(new Date(estimate.updatedAt))}
+                  </span>
+                </p>
+              ) : (
+                <p className="mt-2 text-[13px] text-ink-2">
+                  No estimate yet ·{" "}
+                  <Link
+                    className="font-semibold text-accent hover:text-accent-hover"
+                    href="/assess/"
+                  >
+                    Take placement test
+                  </Link>
+                </p>
+              )}
               <div className="mt-4 flex gap-6 border-t border-line-2 pt-3">
                 <div>
                   <p className="text-base font-bold">{progress.lessonsCompleted}</p>

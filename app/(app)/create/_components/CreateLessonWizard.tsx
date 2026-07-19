@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "@/components/SessionContext";
 import { Stepper } from "@/components/ui/Stepper";
+import { getProfileLevels } from "@/lib/api/assessments";
 import { generateLessonPrompt, type LessonIssue } from "@/lib/api/lessons";
+import type { LanguageCode } from "@/lib/lesson-catalog";
 import { promptParamsSchema } from "@/lib/validation/lesson";
 import { ImportStep } from "./ImportStep";
 import { ParametersStep } from "./ParametersStep";
@@ -40,6 +42,31 @@ export function CreateLessonWizard() {
   const [params, setParams] = useState<WizardParams>(DEFAULT_PARAMS);
   const [prompt, setPrompt] = useState<PromptState>({ status: "loading" });
   const [paramsError, setParamsError] = useState("");
+  const [estimatedLevels, setEstimatedLevels] = useState<
+    Partial<Record<LanguageCode, string>>
+  >({});
+
+  useEffect(() => {
+    let active = true;
+    getProfileLevels(session).then((result) => {
+      if (!active || !result.ok) return;
+      const levels: Partial<Record<LanguageCode, string>> = {};
+      for (const entry of result.data) {
+        levels[entry.language as LanguageCode] = entry.level;
+      }
+      setEstimatedLevels(levels);
+      setParams((current) => {
+        const estimate = levels[current.language];
+        if (!estimate || current.level !== DEFAULT_PARAMS.level) {
+          return current;
+        }
+        return { ...current, level: estimate };
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, [session]);
 
   async function buildPrompt(next: WizardParams) {
     setPrompt({ status: "loading" });
@@ -105,6 +132,7 @@ export function CreateLessonWizard() {
       {step === 0 ? (
         <ParametersStep
           error={paramsError}
+          estimatedLevels={estimatedLevels}
           onChange={setParams}
           onNext={startPrompt}
           params={params}

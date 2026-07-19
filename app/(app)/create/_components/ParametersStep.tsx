@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { ChoiceChip } from "@/components/ui/ChoiceChip";
@@ -13,6 +14,7 @@ import {
   EXERCISE_TYPES,
   LANGUAGES,
   LESSON_LENGTHS,
+  type LanguageCode,
   type LanguageOption,
 } from "@/lib/lesson-catalog";
 import type { WizardParams } from "./CreateLessonWizard";
@@ -20,6 +22,7 @@ import type { WizardParams } from "./CreateLessonWizard";
 type ParametersStepProps = {
   params: WizardParams;
   error: string;
+  estimatedLevels: Partial<Record<LanguageCode, string>>;
   onChange: (params: WizardParams) => void;
   onNext: () => void;
 };
@@ -33,11 +36,16 @@ const LANGUAGE_TEXT: Record<LanguageOption["tone"], string> = {
 export function ParametersStep({
   params,
   error,
+  estimatedLevels,
   onChange,
   onNext,
 }: ParametersStepProps) {
   function selectLanguage(option: LanguageOption) {
-    onChange({ ...params, language: option.code, level: option.levels[0] });
+    onChange({
+      ...params,
+      language: option.code,
+      level: estimatedLevels[option.code] ?? option.levels[0],
+    });
   }
 
   function toggleType(code: string) {
@@ -86,6 +94,11 @@ export function ParametersStep({
         <div>
           <Label className="mb-2.5 block text-[13px] font-semibold">
             Level
+            {estimatedLevels[params.language] === params.level ? (
+              <span className="ml-2 font-normal text-ink-3">
+                from your placement
+              </span>
+            ) : null}
           </Label>
           <SegmentedControl
             name="level"
@@ -96,6 +109,17 @@ export function ParametersStep({
             }))}
             value={params.level}
           />
+          {!estimatedLevels[params.language] ? (
+            <p className="mt-2 text-xs text-ink-3">
+              Not sure?{" "}
+              <Link
+                className="font-semibold text-accent hover:text-accent-hover"
+                href="/assess/"
+              >
+                Take the placement test →
+              </Link>
+            </p>
+          ) : null}
         </div>
         <div>
           <Label className="mb-2.5 block text-[13px] font-semibold">

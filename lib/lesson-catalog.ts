@@ -47,6 +47,24 @@ export function levelLabel(code: string, level: string): string {
   return option ? `${option.levelSystem} ${level}` : level;
 }
 
+const LEVEL_DESCRIPTORS: Record<string, string> = {
+  N5: "beginner",
+  N4: "upper-beginner",
+  N3: "intermediate",
+  N2: "upper-intermediate",
+  N1: "advanced",
+  A1: "beginner",
+  A2: "elementary",
+  B1: "intermediate",
+  B2: "upper-intermediate",
+  C1: "advanced",
+  C2: "proficient",
+};
+
+export function levelDescriptor(level: string): string {
+  return LEVEL_DESCRIPTORS[level] ?? "";
+}
+
 export type ExerciseTypeCode =
   | "cloze"
   | "translation"

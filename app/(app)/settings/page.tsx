@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Heading } from "@/components/ui/Heading";
+import { AssessmentHistory } from "./_components/AssessmentHistory";
 import { TokenManager } from "./_components/TokenManager";
 
 export default function SettingsPage() {
@@ -17,6 +18,7 @@ export default function SettingsPage() {
         </Link>
       </div>
       <TokenManager />
+      <AssessmentHistory />
     </div>
   );
 }
