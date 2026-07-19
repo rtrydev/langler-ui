@@ -18,11 +18,24 @@ export type PromptRequest = {
   language: string;
   level: string;
   topic: string;
+  topicSlug?: string;
   exerciseTypes: string[];
   readingStage: "connected" | "foundational";
   length: string;
   includeReference: boolean;
 };
+
+export type LessonTopic = {
+  slug: string;
+  name: string;
+  description: string;
+  wordCount: number;
+  coveredCount: number;
+};
+
+export type TopicsResult =
+  | { ok: true; topics: LessonTopic[] }
+  | { ok: false; error: LessonApiError };
 
 export type PromptResult =
   | { ok: true; prompt: string }
@@ -215,6 +228,30 @@ export async function generateLessonPrompt(
     }
     const data = (await response.json()) as { prompt: string };
     return { ok: true, prompt: data.prompt };
+  } catch {
+    return { ok: false, error: unavailable };
+  }
+}
+
+export async function listLessonTopics(
+  session: AuthSession,
+  language: string,
+  level: string,
+): Promise<TopicsResult> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    return { ok: false, error: missingConfig };
+  }
+  try {
+    const query = new URLSearchParams({ lang: language, level });
+    const response = await fetch(`${apiUrl}/lessons/topics?${query}`, {
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    });
+    if (!response.ok) {
+      return { ok: false, error: (await responseError(response)).error };
+    }
+    const data = (await response.json()) as { topics: LessonTopic[] };
+    return { ok: true, topics: data.topics };
   } catch {
     return { ok: false, error: unavailable };
   }

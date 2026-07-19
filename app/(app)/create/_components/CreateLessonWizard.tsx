@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { useSession } from "@/components/SessionContext";
 import { Stepper } from "@/components/ui/Stepper";
 import { getProfileLevels } from "@/lib/api/assessments";
-import { generateLessonPrompt, type LessonIssue } from "@/lib/api/lessons";
+import {
+  generateLessonPrompt,
+  listLessonTopics,
+  type LessonIssue,
+  type LessonTopic,
+} from "@/lib/api/lessons";
 import type { LanguageCode } from "@/lib/lesson-catalog";
 import { promptParamsSchema } from "@/lib/validation/lesson";
 import { ImportStep } from "./ImportStep";
@@ -15,6 +20,7 @@ export type WizardParams = {
   language: "ja" | "my" | "pl";
   level: string;
   topic: string;
+  topicSlug: string;
   length: "short" | "standard" | "long";
   exerciseTypes: string[];
   foundational: boolean;
@@ -25,6 +31,7 @@ const DEFAULT_PARAMS: WizardParams = {
   language: "ja",
   level: "N5",
   topic: "",
+  topicSlug: "",
   length: "standard",
   exerciseTypes: ["cloze", "translation", "reading"],
   foundational: false,
@@ -45,6 +52,7 @@ export function CreateLessonWizard() {
   const [estimatedLevels, setEstimatedLevels] = useState<
     Partial<Record<LanguageCode, string>>
   >({});
+  const [topics, setTopics] = useState<LessonTopic[]>([]);
 
   useEffect(() => {
     let active = true;
@@ -68,12 +76,34 @@ export function CreateLessonWizard() {
     };
   }, [session]);
 
+  useEffect(() => {
+    let active = true;
+    listLessonTopics(session, params.language, params.level).then((result) => {
+      if (!active) return;
+      const loaded = result.ok ? result.topics : [];
+      setTopics(loaded);
+      setParams((current) => {
+        if (
+          current.topicSlug === "" ||
+          loaded.some((topic) => topic.slug === current.topicSlug)
+        ) {
+          return current;
+        }
+        return { ...current, topicSlug: "" };
+      });
+    });
+    return () => {
+      active = false;
+    };
+  }, [session, params.language, params.level]);
+
   async function buildPrompt(next: WizardParams) {
     setPrompt({ status: "loading" });
     const request = {
       language: next.language,
       level: next.level,
       topic: next.topic.trim(),
+      ...(next.topicSlug !== "" ? { topicSlug: next.topicSlug } : {}),
       exerciseTypes: next.exerciseTypes,
       readingStage: next.foundational
         ? ("foundational" as const)
@@ -136,6 +166,7 @@ export function CreateLessonWizard() {
           onChange={setParams}
           onNext={startPrompt}
           params={params}
+          topics={topics}
         />
       ) : null}
       {step === 1 ? (

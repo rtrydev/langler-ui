@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { checkPastedLesson } from "@/lib/validation/lesson";
+import {
+  checkPastedLesson,
+  promptParamsSchema,
+} from "@/lib/validation/lesson";
 
 const validDocument = JSON.stringify({
   schemaVersion: "1.0",
@@ -49,5 +52,39 @@ describe("checkPastedLesson", () => {
   it("rejects an empty paste", () => {
     const result = checkPastedLesson("   ");
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("promptParamsSchema", () => {
+  const base = {
+    language: "ja",
+    level: "N5",
+    topic: "Food & drink",
+    exerciseTypes: ["cloze"],
+    readingStage: "connected",
+    length: "standard",
+    includeReference: true,
+  };
+
+  it("accepts a request without a topic slug", () => {
+    expect(promptParamsSchema.safeParse(base).success).toBe(true);
+  });
+
+  it("accepts a valid topic slug", () => {
+    const result = promptParamsSchema.safeParse({
+      ...base,
+      topicSlug: "food-drink",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.topicSlug).toBe("food-drink");
+    }
+  });
+
+  it("rejects a malformed topic slug", () => {
+    expect(
+      promptParamsSchema.safeParse({ ...base, topicSlug: "Food & Drink" })
+        .success,
+    ).toBe(false);
   });
 });

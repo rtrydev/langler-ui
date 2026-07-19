@@ -7,8 +7,10 @@ import { ChoiceChip } from "@/components/ui/ChoiceChip";
 import { FieldMessage } from "@/components/ui/FieldMessage";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
+import { Pill } from "@/components/ui/Pill";
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { LanguagePicker } from "@/components/LanguagePicker";
+import type { LessonTopic } from "@/lib/api/lessons";
 import {
   EXERCISE_TYPES,
   LANGUAGES,
@@ -22,6 +24,7 @@ type ParametersStepProps = {
   params: WizardParams;
   error: string;
   estimatedLevels: Partial<Record<LanguageCode, string>>;
+  topics: LessonTopic[];
   onChange: (params: WizardParams) => void;
   onNext: () => void;
 };
@@ -30,6 +33,7 @@ export function ParametersStep({
   params,
   error,
   estimatedLevels,
+  topics,
   onChange,
   onNext,
 }: ParametersStepProps) {
@@ -39,6 +43,14 @@ export function ParametersStep({
       language: option.code,
       level: estimatedLevels[option.code] ?? option.levels[0],
     });
+  }
+
+  function selectTopic(topic: LessonTopic) {
+    if (params.topicSlug === topic.slug) {
+      onChange({ ...params, topic: "", topicSlug: "" });
+      return;
+    }
+    onChange({ ...params, topic: topic.name, topicSlug: topic.slug });
   }
 
   function toggleType(code: string) {
@@ -113,10 +125,41 @@ export function ParametersStep({
         <Input
           id="topic"
           maxLength={120}
-          onChange={(event) => onChange({ ...params, topic: event.target.value })}
+          onChange={(event) =>
+            onChange({ ...params, topic: event.target.value, topicSlug: "" })
+          }
           placeholder="Weekend travel — a trip to Kyoto"
           value={params.topic}
         />
+        {topics.length > 0 ? (
+          <>
+            <p className="mt-2.5 text-xs text-ink-3">
+              Or pick a suggestion — the lesson then uses words from that topic
+              you have not covered yet.
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {topics.map((topic) => (
+                <Pill
+                  key={topic.slug}
+                  onClick={() => selectTopic(topic)}
+                  selected={params.topicSlug === topic.slug}
+                  title={topic.description}
+                >
+                  {topic.name}
+                  <span
+                    className={
+                      params.topicSlug === topic.slug
+                        ? "text-[11px] font-normal opacity-80"
+                        : "text-[11px] text-ink-3"
+                    }
+                  >
+                    {topic.coveredCount}/{topic.wordCount}
+                  </span>
+                </Pill>
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
 
       <fieldset>

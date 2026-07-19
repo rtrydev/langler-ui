@@ -199,3 +199,56 @@ describe("saveLessonResult", () => {
     });
   });
 });
+
+describe("listLessonTopics", () => {
+  it("requests topics for the language and level with the Cognito token", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    const topics = [
+      {
+        slug: "food-drink",
+        name: "Food & drink",
+        description: "Meals and cooking",
+        wordCount: 41,
+        coveredCount: 12,
+      },
+    ];
+    const request = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ topics })));
+    vi.stubGlobal("fetch", request);
+
+    const { listLessonTopics } = await import("@/lib/api/lessons");
+    const result = await listLessonTopics(session, "ja", "N5");
+
+    expect(result).toEqual({ ok: true, topics });
+    expect(request).toHaveBeenCalledWith(
+      "https://api.example.com/lessons/topics?lang=ja&level=N5",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer access-token",
+        }),
+      }),
+    );
+  });
+
+  it("returns a response error on failure", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response(JSON.stringify({ error: "boom" }), { status: 500 }),
+        ),
+    );
+
+    const { listLessonTopics } = await import("@/lib/api/lessons");
+    const result = await listLessonTopics(session, "ja", "N5");
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error.kind).toBe("response");
+      expect(result.error.message).toBe("boom");
+    }
+  });
+});

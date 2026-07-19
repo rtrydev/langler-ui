@@ -4,6 +4,10 @@ export const promptParamsSchema = z.object({
   language: z.enum(["ja", "my", "pl"]),
   level: z.string().min(1, "Pick a level."),
   topic: z.string().trim().max(120, "Keep the topic under 120 characters."),
+  topicSlug: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]{0,63}$/, "Pick a suggested topic again.")
+    .optional(),
   exerciseTypes: z
     .array(z.string().min(1))
     .min(1, "Pick at least one exercise type."),
