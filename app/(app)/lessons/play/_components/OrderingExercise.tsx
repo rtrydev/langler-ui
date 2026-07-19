@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
-import { gradeOrdering, stringItems } from "@/lib/lesson-grading";
+import { gradeOrdering, seededShuffle, stringItems } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
 export function OrderingExercise({ exercise, onComplete }: ExercisePlayerProps) {
   const expected = stringItems(exercise);
-  const initial = [...expected].reverse();
-  const [remaining, setRemaining] = useState(initial);
+  const [remaining, setRemaining] = useState(() =>
+    seededShuffle(expected, exercise.exerciseId),
+  );
   const [arranged, setArranged] = useState<string[]>([]);
   const [checked, setChecked] = useState(false);
   const outcome = gradeOrdering(exercise, arranged);

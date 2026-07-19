@@ -9,7 +9,7 @@ import { OptionCard } from "@/components/ui/OptionCard";
 import { Switch } from "@/components/ui/Switch";
 import { useSession } from "@/components/SessionContext";
 import { listVocabulary, type VocabEntry } from "@/lib/api/reference";
-import { gradeReading } from "@/lib/lesson-grading";
+import { gradeReading, matchesAnswer, questionAnswers, seededShuffle } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
 export function ReadingExercise({
@@ -54,16 +54,26 @@ export function ReadingExercise({
       </article>
       <section aria-label="Comprehension questions" className="mt-7 border-t border-line-2 pt-7 lg:mt-0 lg:max-h-[62vh] lg:overflow-y-auto lg:border-t-0 lg:bg-paper lg:px-7 lg:pt-0">
         <div className="grid gap-7">
-          {questions.map((question, questionIndex) => (
-            <fieldset disabled={checked} key={`${question.question}-${questionIndex}`}>
-              <legend className="font-jp text-base font-medium leading-relaxed"><span className="mr-2 text-xs text-ink-3">{questionIndex + 1}.</span>{question.question}</legend>
-              {question.kind === "multiple_choice" ? (
-                <div className="mt-3 grid gap-2">{question.options?.map((option) => <OptionCard className="font-jp py-3" key={option} onClick={() => setResponses({ ...responses, [questionIndex]: option })} selected={responses[questionIndex] === option}>{option}</OptionCard>)}</div>
-              ) : (
-                <Input className="mt-3 font-jp" onChange={(event) => setResponses({ ...responses, [questionIndex]: event.target.value })} value={responses[questionIndex] ?? ""} />
-              )}
-            </fieldset>
-          ))}
+          {questions.map((question, questionIndex) => {
+            const answers = questionAnswers(question);
+            const wrong =
+              checked &&
+              answers.length > 0 &&
+              !matchesAnswer(responses[questionIndex] ?? "", answers);
+            return (
+              <fieldset disabled={checked} key={`${question.question}-${questionIndex}`}>
+                <legend className="font-jp text-base font-medium leading-relaxed"><span className="mr-2 text-xs text-ink-3">{questionIndex + 1}.</span>{question.question}</legend>
+                {question.kind === "multiple_choice" ? (
+                  <div className="mt-3 grid gap-2">{seededShuffle(question.options ?? [], `${exercise.exerciseId}-${questionIndex}`).map((option) => <OptionCard className={`font-jp py-3 ${checked && option === question.answer ? "border-success" : ""}`} key={option} onClick={() => setResponses({ ...responses, [questionIndex]: option })} selected={responses[questionIndex] === option}>{option}</OptionCard>)}</div>
+                ) : (
+                  <Input className="mt-3 font-jp" onChange={(event) => setResponses({ ...responses, [questionIndex]: event.target.value })} value={responses[questionIndex] ?? ""} />
+                )}
+                {wrong ? (
+                  <p className="mt-2 text-sm text-crimson">Correct answer: <span className="font-jp">{question.answer}</span></p>
+                ) : null}
+              </fieldset>
+            );
+          })}
         </div>
         {checked ? <Callout className="mt-5" tone={outcome.correct === outcome.total ? "success" : "warning"}>{outcome.correct} of {outcome.total} gradable answers correct.</Callout> : null}
         <div className="mt-6 flex justify-end">{checked ? <Button onClick={() => onComplete(outcome)}>Next →</Button> : <Button disabled={questions.some((_, index) => !(responses[index] ?? "").trim())} onClick={() => setChecked(true)}>Check</Button>}</div>

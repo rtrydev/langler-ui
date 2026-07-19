@@ -83,9 +83,18 @@ export type ClozeBlank = {
   hint?: string;
 };
 
+export type ExerciseQuestion = {
+  question: string;
+  kind?: string;
+  options?: string[];
+  answer?: string;
+  alternates?: string[];
+};
+
 export type ExercisePayload = {
   text?: string;
   blanks?: ClozeBlank[];
+  wordBank?: string[];
   source?: string;
   reference?: string;
   items?: Array<string | { glyph: string; reading?: string; meaning?: string }>;
@@ -95,12 +104,7 @@ export type ExercisePayload = {
   title?: string;
   passage?: string;
   annotations?: Array<{ surface: string; reading?: string; gloss?: string }>;
-  questions?: Array<{
-    question: string;
-    kind: string;
-    options?: string[];
-    answer?: string;
-  }>;
+  questions?: ExerciseQuestion[];
   guidance?: string;
   modelAnswer?: string;
 };

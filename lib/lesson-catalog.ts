@@ -70,18 +70,26 @@ export type ExerciseTypeCode =
   | "translation"
   | "ordering"
   | "matching"
+  | "multiple_choice"
   | "reading"
   | "writing_prompt"
   | "script_practice";
 
-export const EXERCISE_TYPES: Array<{ code: ExerciseTypeCode; label: string }> = [
-  { code: "cloze", label: "Cloze" },
-  { code: "translation", label: "Translation" },
-  { code: "ordering", label: "Ordering" },
-  { code: "matching", label: "Matching" },
-  { code: "reading", label: "Reading" },
-  { code: "writing_prompt", label: "Writing prompt" },
-  { code: "script_practice", label: "Script practice" },
+export type ExerciseTypeOption = {
+  code: ExerciseTypeCode;
+  label: string;
+  grading: "auto" | "self";
+};
+
+export const EXERCISE_TYPES: ExerciseTypeOption[] = [
+  { code: "multiple_choice", label: "Multiple choice", grading: "auto" },
+  { code: "matching", label: "Matching", grading: "auto" },
+  { code: "cloze", label: "Cloze", grading: "auto" },
+  { code: "ordering", label: "Ordering", grading: "auto" },
+  { code: "reading", label: "Reading", grading: "auto" },
+  { code: "script_practice", label: "Script practice", grading: "self" },
+  { code: "translation", label: "Translation", grading: "self" },
+  { code: "writing_prompt", label: "Writing prompt", grading: "self" },
 ];
 
 export function exerciseTypeLabel(code: string): string {

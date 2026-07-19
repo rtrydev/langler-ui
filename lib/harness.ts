@@ -32,6 +32,7 @@ Use Langler's reference API before writing a lesson. The API base URL is ${machi
 ## Quality bar
 
 - Match vocabulary, grammar, passage length, and question difficulty to the requested level.
+- Prefer exercises the app can grade automatically: multiple_choice, matching, ordering, and cloze with a \`wordBank\`. Give comprehension questions \`kind: multiple_choice\`; reserve short_answer for questions that cannot be closed-form and list accepted phrasings in \`alternates\`. Translation and writing prompts are self-assessed, so use them sparingly.
 - Ground the story in the selected topic and retrieved targets; use those targets naturally rather than listing them.
 - Include at least two comprehension questions for connected lessons when the learner can reasonably answer them.
 - Do not call any server-side model endpoint. You are the author; Langler validates, stores, plays, and prints.
@@ -179,7 +180,7 @@ components:
       required: [exerciseId, type, payload]
       properties:
         exerciseId: { type: string, minLength: 1 }
-        type: { type: string, enum: [cloze, translation, ordering, matching, reading, writing_prompt, script_practice] }
+        type: { type: string, enum: [cloze, translation, ordering, matching, multiple_choice, reading, writing_prompt, script_practice] }
         prompt: { type: string }
         points: { type: integer, minimum: 0 }
         referencedVocab: { type: array, items: { type: string } }
@@ -190,6 +191,7 @@ components:
             - $ref: '#/components/schemas/TranslationPayload'
             - $ref: '#/components/schemas/OrderingPayload'
             - $ref: '#/components/schemas/MatchingPayload'
+            - $ref: '#/components/schemas/MultipleChoicePayload'
             - $ref: '#/components/schemas/ReadingPayload'
             - $ref: '#/components/schemas/WritingPayload'
             - $ref: '#/components/schemas/ScriptPayload'
@@ -210,6 +212,11 @@ components:
               answer: { type: string }
               alternates: { type: array, items: { type: string } }
               hint: { type: string }
+        wordBank:
+          type: array
+          maxItems: 40
+          items: { type: string }
+          description: Selectable answer pool. Include every blank answer plus a few plausible distractors so the learner taps instead of typing.
     TranslationPayload:
       type: object
       additionalProperties: false
@@ -240,6 +247,23 @@ components:
             properties:
               left: { type: string }
               right: { type: string }
+    MultipleChoicePayload:
+      type: object
+      additionalProperties: false
+      required: [questions]
+      properties:
+        questions:
+          type: array
+          minItems: 1
+          maxItems: 10
+          items:
+            type: object
+            additionalProperties: false
+            required: [question, options, answer]
+            properties:
+              question: { type: string }
+              options: { type: array, minItems: 2, maxItems: 6, items: { type: string } }
+              answer: { type: string, description: Must exactly equal one option. }
     ReadingPayload:
       type: object
       additionalProperties: false
@@ -270,6 +294,7 @@ components:
               kind: { type: string, enum: [multiple_choice, short_answer] }
               options: { type: array, items: { type: string } }
               answer: { type: string }
+              alternates: { type: array, maxItems: 10, items: { type: string }, description: Additional accepted short-answer phrasings. }
     WritingPayload:
       type: object
       additionalProperties: false

@@ -167,7 +167,26 @@ export function ParametersStep({
           Exercise types
         </legend>
         <div className="flex flex-wrap gap-2">
-          {EXERCISE_TYPES.filter((type) => type.code !== "reading").map(
+          {EXERCISE_TYPES.filter(
+            (type) => type.code !== "reading" && type.grading === "auto",
+          ).map((type) => (
+            <ChoiceChip
+              checked={params.exerciseTypes.includes(type.code)}
+              key={type.code}
+              name="exercise-types"
+              onChange={() => toggleType(type.code)}
+              type="checkbox"
+            >
+              {type.label}
+            </ChoiceChip>
+          ))}
+        </div>
+        <p className="mb-2 mt-4 text-xs text-ink-3">
+          Self-assessed — the app cannot check these automatically, so they work
+          best on printed worksheets.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {EXERCISE_TYPES.filter((type) => type.grading === "self").map(
             (type) => (
               <ChoiceChip
                 checked={params.exerciseTypes.includes(type.code)}

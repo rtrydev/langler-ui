@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   gradeCloze,
   gradeMatching,
+  gradeMultipleChoice,
   gradeOrdering,
   gradeReading,
   matchesAnswer,
+  seededShuffle,
 } from "@/lib/lesson-grading";
 import type { LessonExercise } from "@/lib/api/lessons";
 
@@ -54,5 +56,53 @@ describe("lesson grading", () => {
     };
 
     expect(gradeReading(reading, { 0: "Kyoto", 1: "For fun" })).toEqual(expect.objectContaining({ correct: 1, total: 1, score: 8 }));
+  });
+
+  it("accepts short-answer alternates in reading questions", () => {
+    const reading: LessonExercise = {
+      exerciseId: "reading-2",
+      type: "reading",
+      points: 4,
+      payload: {
+        questions: [
+          {
+            question: "Who?",
+            kind: "short_answer",
+            answer: "友達と行きました。",
+            alternates: ["友達", "友達と"],
+          },
+        ],
+      },
+    };
+    expect(gradeReading(reading, { 0: "友達" }).score).toBe(4);
+    expect(gradeReading(reading, { 0: "先生" }).score).toBe(0);
+  });
+
+  it("grades multiple choice against the exact answer option", () => {
+    const exercise: LessonExercise = {
+      exerciseId: "mc-1",
+      type: "multiple_choice",
+      points: 6,
+      payload: {
+        questions: [
+          { question: "q1", options: ["went", "ate", "ran"], answer: "went" },
+          { question: "q2", options: ["water", "fire"], answer: "fire" },
+          { question: "q3", options: ["a", "b"], answer: "b" },
+        ],
+      },
+    };
+    expect(gradeMultipleChoice(exercise, { 0: "went", 1: "fire", 2: "a" })).toEqual(
+      expect.objectContaining({ grading: "auto", correct: 2, total: 3, score: 4 }),
+    );
+  });
+
+  it("shuffles deterministically without leaking the source order", () => {
+    const items = ["a", "b", "c", "d", "e", "f"];
+    const first = seededShuffle(items, "ex-1");
+    expect(seededShuffle(items, "ex-1")).toEqual(first);
+    expect([...first].sort()).toEqual([...items].sort());
+    expect(first).not.toEqual(items);
+    expect(seededShuffle(["x", "y"], "pair")).not.toEqual(["x", "y"]);
+    expect(items).toEqual(["a", "b", "c", "d", "e", "f"]);
   });
 });

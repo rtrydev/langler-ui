@@ -4,12 +4,15 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { OptionCard } from "@/components/ui/OptionCard";
-import { gradeMatching } from "@/lib/lesson-grading";
+import { gradeMatching, seededShuffle } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
 export function MatchingExercise({ exercise, onComplete }: ExercisePlayerProps) {
   const pairs = exercise.payload?.pairs ?? [];
-  const rightItems = [...pairs.map((pair) => pair.right)].reverse();
+  const rightItems = seededShuffle(
+    pairs.map((pair) => pair.right),
+    exercise.exerciseId,
+  );
   const [selected, setSelected] = useState<string | null>(null);
   const [matches, setMatches] = useState<Record<string, string>>({});
   const [checked, setChecked] = useState(false);
@@ -36,7 +39,14 @@ export function MatchingExercise({ exercise, onComplete }: ExercisePlayerProps) 
           {rightItems.map((right) => <OptionCard disabled={checked || !selected} key={right} onClick={() => assign(right)} selected={Object.values(matches).includes(right)}>{right}</OptionCard>)}
         </div>
       </div>
-      {checked ? <Callout className="mt-5" tone={outcome.correct === outcome.total ? "success" : "warning"}>{outcome.correct} of {outcome.total} pairs correct.</Callout> : null}
+      {checked ? (
+        <Callout className="mt-5" tone={outcome.correct === outcome.total ? "success" : "warning"}>
+          {outcome.correct} of {outcome.total} pairs correct.
+          {pairs.filter((pair) => matches[pair.left] !== pair.right).map((pair) => (
+            <span className="mt-1 block font-jp" key={pair.left}>{pair.left} → {pair.right}</span>
+          ))}
+        </Callout>
+      ) : null}
       <div className="mt-7 flex justify-end">
         {checked ? <Button onClick={() => onComplete(outcome)}>Next →</Button> : <Button disabled={Object.keys(matches).length !== pairs.length} onClick={() => setChecked(true)}>Check</Button>}
       </div>

@@ -1,12 +1,42 @@
 import type {
   ClozeBlank,
   ExerciseOutcome,
+  ExerciseQuestion,
   LessonExercise,
   LessonResultDocument,
 } from "@/lib/api/lessons";
 
 export function normalizeAnswer(value: string): string {
   return value.normalize("NFKC").trim().replace(/\s+/g, " ").toLocaleLowerCase();
+}
+
+// Deterministic Fisher-Yates keyed on the exercise id: stable across
+// server/client renders (no hydration mismatch) but decoupled from the
+// answer-revealing source order the AI produced.
+export function seededShuffle<T>(items: T[], seed: string): T[] {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash ^= seed.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  let state = hash >>> 0;
+  const next = () => {
+    state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(next() * (index + 1));
+    [shuffled[index], shuffled[swap]] = [shuffled[swap], shuffled[index]];
+  }
+  if (
+    items.length > 1 &&
+    shuffled.every((item, index) => item === items[index]) &&
+    new Set(items).size > 1
+  ) {
+    shuffled.push(shuffled.shift() as T);
+  }
+  return shuffled;
 }
 
 export function matchesAnswer(value: string, answers: string[]): boolean {
@@ -50,16 +80,33 @@ export function gradeMatching(
   return autoOutcome(exercise, correct, pairs.length);
 }
 
+export function questionAnswers(question: ExerciseQuestion): string[] {
+  if (!question.answer?.trim()) return [];
+  return [question.answer, ...(question.alternates ?? [])];
+}
+
 export function gradeReading(
   exercise: LessonExercise,
   responses: Record<number, string>,
 ): ExerciseOutcome {
   const questions = exercise.payload?.questions ?? [];
   const gradable = questions.filter((question) => question.answer?.trim());
-  const correct = questions.filter((question, index) =>
-    question.answer?.trim() && matchesAnswer(responses[index] ?? "", [question.answer]),
-  ).length;
+  const correct = questions.filter((question, index) => {
+    const answers = questionAnswers(question);
+    return answers.length > 0 && matchesAnswer(responses[index] ?? "", answers);
+  }).length;
   return autoOutcome(exercise, correct, gradable.length);
+}
+
+export function gradeMultipleChoice(
+  exercise: LessonExercise,
+  responses: Record<number, string>,
+): ExerciseOutcome {
+  const questions = exercise.payload?.questions ?? [];
+  const correct = questions.filter(
+    (question, index) => responses[index] === question.answer,
+  ).length;
+  return autoOutcome(exercise, correct, questions.length);
 }
 
 export function selfOutcome(

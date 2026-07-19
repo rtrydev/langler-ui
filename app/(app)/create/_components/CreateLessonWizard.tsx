@@ -33,7 +33,7 @@ const DEFAULT_PARAMS: WizardParams = {
   topic: "",
   topicSlug: "",
   length: "standard",
-  exerciseTypes: ["cloze", "translation", "reading"],
+  exerciseTypes: ["multiple_choice", "matching", "cloze", "reading"],
   foundational: false,
   includeReference: true,
 };

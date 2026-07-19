@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { ClozeExercise } from "./ClozeExercise";
 import { MatchingExercise } from "./MatchingExercise";
+import { MultipleChoiceExercise } from "./MultipleChoiceExercise";
 import { OrderingExercise } from "./OrderingExercise";
 import { ReadingExercise } from "./ReadingExercise";
 import { ScriptPracticeExercise } from "./ScriptPracticeExercise";
@@ -20,6 +21,7 @@ export function ExerciseRenderer({
     translation: <TranslationExercise {...props} />,
     ordering: <OrderingExercise {...props} />,
     matching: <MatchingExercise {...props} />,
+    multiple_choice: <MultipleChoiceExercise {...props} />,
     reading: <ReadingExercise {...props} language={language} level={level} />,
     writing_prompt: <WritingExercise {...props} />,
     script_practice: <ScriptPracticeExercise {...props} language={language} level={level} />,
