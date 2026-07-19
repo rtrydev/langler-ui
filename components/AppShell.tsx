@@ -84,7 +84,7 @@ export function AppShell({ onSignOut, children }: AppShellProps) {
     <div className="min-h-screen bg-paper md:flex">
       <nav
         aria-label="Primary"
-        className="hidden w-[236px] shrink-0 flex-col border-r border-line bg-surface px-4 py-[22px] md:flex"
+        className="sticky top-0 hidden h-screen w-[236px] shrink-0 flex-col overflow-y-auto border-r border-line bg-surface px-4 py-[22px] md:flex"
       >
         <div className="px-2.5 pb-[22px]">
           <Wordmark />
