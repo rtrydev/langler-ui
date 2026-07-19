@@ -136,6 +136,98 @@ describe("Cognito authentication", () => {
     );
   });
 
+  it("restores the session from cookies after a reload", async () => {
+    vi.stubEnv("NEXT_PUBLIC_AWS_REGION", "eu-central-1");
+    vi.stubEnv("NEXT_PUBLIC_COGNITO_CLIENT_ID", "client-id");
+    const claims = btoa(JSON.stringify({ exp: Math.floor(Date.now() / 1000) + 3600 }))
+      .replaceAll("+", "-")
+      .replaceAll("/", "_")
+      .replaceAll("=", "");
+    const session = {
+      accessToken: `header.${claims}.signature`,
+      idToken: "id-token",
+      refreshToken: "refresh-token",
+    };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ AuthenticationResult: {
+        AccessToken: session.accessToken,
+        IdToken: session.idToken,
+        RefreshToken: session.refreshToken,
+      } })),
+    ));
+    await signIn("learner@example.com", "password");
+
+    vi.resetModules();
+    const reloaded = await import("./cognito");
+    const request = vi.fn();
+    vi.stubGlobal("fetch", request);
+
+    await expect(reloaded.restoreSession()).resolves.toEqual(session);
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it("refreshes from the cookie refresh token when the access token expired", async () => {
+    vi.stubEnv("NEXT_PUBLIC_AWS_REGION", "eu-central-1");
+    vi.stubEnv("NEXT_PUBLIC_COGNITO_CLIENT_ID", "client-id");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ AuthenticationResult: {
+        AccessToken: "expired-access-token",
+        IdToken: "id-token",
+        RefreshToken: "refresh-token",
+      } })),
+    ));
+    await signIn("learner@example.com", "password");
+
+    vi.resetModules();
+    const reloaded = await import("./cognito");
+    const request = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ AuthenticationResult: {
+        AccessToken: "rotated-access-token",
+        IdToken: "rotated-id-token",
+        RefreshToken: "rotated-refresh-token",
+      } })),
+    );
+    vi.stubGlobal("fetch", request);
+
+    await expect(reloaded.restoreSession()).resolves.toEqual({
+      accessToken: "rotated-access-token",
+      idToken: "rotated-id-token",
+      refreshToken: "rotated-refresh-token",
+    });
+    expect(request).toHaveBeenCalledWith(
+      "https://cognito-idp.eu-central-1.amazonaws.com/",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          "X-Amz-Target":
+            "AWSCognitoIdentityProviderService.GetTokensFromRefreshToken",
+        }),
+      }),
+    );
+    expect(document.cookie).toContain("langler_refresh=rotated-refresh-token");
+  });
+
+  it("does not restore a session after signing out", async () => {
+    vi.stubEnv("NEXT_PUBLIC_AWS_REGION", "eu-central-1");
+    vi.stubEnv("NEXT_PUBLIC_COGNITO_CLIENT_ID", "client-id");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ AuthenticationResult: {
+        AccessToken: "access-token",
+        IdToken: "id-token",
+        RefreshToken: "refresh-token",
+      } })),
+    ));
+    await signIn("learner@example.com", "password");
+    clearSession();
+
+    vi.resetModules();
+    const reloaded = await import("./cognito");
+    const request = vi.fn();
+    vi.stubGlobal("fetch", request);
+
+    await expect(reloaded.restoreSession()).resolves.toBeNull();
+    expect(request).not.toHaveBeenCalled();
+  });
+
   it("requests and confirms a password reset through Cognito", async () => {
     vi.stubEnv("NEXT_PUBLIC_AWS_REGION", "eu-central-1");
     vi.stubEnv("NEXT_PUBLIC_COGNITO_CLIENT_ID", "client-id");

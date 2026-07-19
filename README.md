@@ -29,7 +29,7 @@ NEXT_PUBLIC_MACHINE_API_URL=https://....execute-api.eu-central-1.amazonaws.com
 NEXT_PUBLIC_REFERENCE_ASSETS_URL=https://....cloudfront.net
 ```
 
-The infrastructure deploy script obtains them from Terraform outputs. Authentication calls Cognito directly, handles the required first-login password change, rotates expired tokens, and keeps tokens only in memory. Reloading the page requires signing in again. The authenticated shell calls `GET /hello` through `lib/api/` with the Cognito access token.
+The infrastructure deploy script obtains them from Terraform outputs. Authentication calls Cognito directly, handles the required first-login password change, rotates expired tokens, and persists the session in cookies (refresh token for 30 days, access/id tokens for an hour), so reloading the page keeps you signed in. The authenticated shell calls `GET /hello` through `lib/api/` with the Cognito access token.
 
 ## Constraints of static export
 

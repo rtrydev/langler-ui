@@ -1,5 +1,11 @@
 import "client-only";
 
+import {
+  clearSessionCookies,
+  readSessionCookies,
+  writeSessionCookies,
+} from "./session-cookies";
+
 export type AuthSession = {
   accessToken: string;
   idToken: string;
@@ -93,6 +99,7 @@ function authSession(
 
 function saveSession(session: AuthSession) {
   currentSession = session;
+  writeSessionCookies(session);
 }
 
 function tokenExpiresSoon(token: string) {
@@ -180,15 +187,17 @@ export async function confirmPasswordReset(
 }
 
 export async function restoreSession() {
-  if (!currentSession) {
+  const session = currentSession ?? readSessionCookies();
+  if (!session) {
     return null;
   }
 
   try {
-    if (!tokenExpiresSoon(currentSession.accessToken)) {
-      return currentSession;
+    if (!tokenExpiresSoon(session.accessToken)) {
+      currentSession = session;
+      return session;
     }
-    if (!currentSession.refreshToken) {
+    if (!session.refreshToken) {
       clearSession();
       return null;
     }
@@ -196,11 +205,11 @@ export async function restoreSession() {
     const { clientId } = configuration();
     const payload = await cognitoRequest("GetTokensFromRefreshToken", {
       ClientId: clientId,
-      RefreshToken: currentSession.refreshToken,
+      RefreshToken: session.refreshToken,
     });
     const refreshed = authSession(
       payload.AuthenticationResult,
-      currentSession.refreshToken,
+      session.refreshToken,
     );
     saveSession(refreshed);
     return refreshed;
@@ -212,4 +221,5 @@ export async function restoreSession() {
 
 export function clearSession() {
   currentSession = null;
+  clearSessionCookies();
 }
