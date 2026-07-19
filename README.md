@@ -31,6 +31,12 @@ NEXT_PUBLIC_REFERENCE_ASSETS_URL=https://....cloudfront.net
 
 The infrastructure deploy script obtains them from Terraform outputs. Authentication calls Cognito directly, handles the required first-login password change, rotates expired tokens, and persists the session in cookies (refresh token for 30 days, access/id tokens for an hour), so reloading the page keeps you signed in. The authenticated shell calls `GET /hello` through `lib/api/` with the Cognito access token.
 
+Burmese reading loads the pruned myWord Viterbi model from
+`NEXT_PUBLIC_REFERENCE_ASSETS_URL/burmese/myword-ngram.json`, refines its word
+boundaries against lesson annotations and reference vocabulary, and provides
+tap-to-define plus learner-controlled romanization. Printable Burmese worksheets
+use the Myanmar font and expanded line height, with an optional romanization layer.
+
 ## Constraints of static export
 
 - No SSR/middleware/server actions; entity pages (e.g. lessons) use query params / client-side routing, not per-ID pre-rendering.

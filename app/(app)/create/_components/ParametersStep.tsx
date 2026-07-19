@@ -131,6 +131,8 @@ export function ParametersStep({
           placeholder={
             params.language === "pl"
               ? "Weekend travel — a trip to Kraków"
+              : params.language === "my"
+                ? "Weekend travel — a trip to Bagan"
               : "Weekend travel — a trip to Kyoto"
           }
           value={params.topic}
@@ -212,7 +214,9 @@ export function ParametersStep({
                 onChange={() => toggleType(type.code)}
                 type="checkbox"
               >
-                {type.label}
+                {type.code === "script_practice" && params.language === "my"
+                  ? "Burmese writing practice"
+                  : type.label}
               </ChoiceChip>
             ),
           )}

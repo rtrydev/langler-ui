@@ -31,7 +31,7 @@ export function ScriptPracticeExercise({
   const assetUrl = strokeReference ? strokeAssetUrl(strokeReference) : undefined;
 
   useEffect(() => {
-    if (language !== "ja") return;
+    if (language !== "ja" && language !== "my") return;
     let active = true;
     listScriptGlyphs(session, language, level).then((result) => {
       if (active && result.ok) setReferences(result.data);
@@ -44,19 +44,19 @@ export function ScriptPracticeExercise({
   return (
     <div>
       <p className="text-sm text-ink-2">{exercise.prompt || "Trace the model, then write it yourself."}</p>
-      <div className="mt-5 flex flex-wrap gap-2">{items.map((entry, index) => <Button className="font-jp text-lg" key={`${entry.glyph}-${index}`} onClick={() => { setSelected(index); setDrawn(false); setClearSignal(clearSignal + 1); }} variant={selected === index ? "primary" : "secondary"}>{entry.glyph}</Button>)}</div>
+      <div className="mt-5 flex flex-wrap gap-2">{items.map((entry, index) => <Button className={`${language === "my" ? "font-myanmar" : "font-jp"} text-lg`} key={`${entry.glyph}-${index}`} onClick={() => { setSelected(index); setDrawn(false); setClearSignal(clearSignal + 1); }} variant={selected === index ? "primary" : "secondary"}>{entry.glyph}</Button>)}</div>
       <div className="mt-6 grid gap-7 md:grid-cols-[13rem_minmax(0,1fr)]">
         <div>
-          <GlyphTile guides className="font-jp-serif text-8xl">{item.glyph}</GlyphTile>
-          <p className="mt-3 text-center font-jp font-semibold">{item.reading}</p>
+          <GlyphTile guides className={`${language === "my" ? "font-myanmar leading-relaxed" : "font-jp-serif"} text-8xl`}>{item.glyph}</GlyphTile>
+          {showGuide ? <p className="mt-3 text-center font-semibold">{item.reading || reference?.readings.romanization?.[0]}</p> : null}
           <p className="text-center text-xs text-ink-3">{item.meaning}{reference?.strokeCount ? ` · ${reference.strokeCount} strokes` : ""}</p>
         </div>
         <div>
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-3">KanjiVG stroke order</p>
-            <Switch checked={showGuide} onChange={(event) => setShowGuide(event.target.checked)}>Trace guide</Switch>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-3">{language === "my" ? "Burmese writing practice" : "KanjiVG stroke order"}</p>
+            <Switch checked={showGuide} onChange={(event) => setShowGuide(event.target.checked)}>{language === "my" ? "Romanization & guide" : "Trace guide"}</Switch>
           </div>
-          {assetUrl ? <object aria-label={`Stroke order for ${item.glyph}`} className="mt-3 h-36 w-36 rounded-lg border border-line bg-surface p-2" data={assetUrl} type="image/svg+xml" /> : <div className="mt-3 flex h-24 items-center text-xs text-ink-3">Stroke-order reference appears when the asset CDN is configured.</div>}
+          {language === "ja" ? assetUrl ? <object aria-label={`Stroke order for ${item.glyph}`} className="mt-3 h-36 w-36 rounded-lg border border-line bg-surface p-2" data={assetUrl} type="image/svg+xml" /> : <div className="mt-3 flex h-24 items-center text-xs text-ink-3">Stroke-order reference appears when the asset CDN is configured.</div> : null}
           <div className="mt-4 grid max-w-lg grid-cols-2 gap-3"><DrawingPad clearSignal={clearSignal} guide={showGuide ? item.glyph : undefined} onDraw={() => setDrawn(true)} /><DrawingPad clearSignal={clearSignal} onDraw={() => setDrawn(true)} /></div>
           <Button className="mt-3" onClick={() => { setClearSignal(clearSignal + 1); setDrawn(false); }} variant="secondary">Clear</Button>
         </div>

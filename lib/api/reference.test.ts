@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { listVocabulary } from "@/lib/api/reference";
+import { listReadingPassages, listVocabulary } from "@/lib/api/reference";
 import type { AuthSession } from "@/lib/auth/cognito";
 
 vi.mock("client-only", () => ({}));
@@ -13,6 +13,23 @@ const session: AuthSession = {
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
+});
+
+describe("listReadingPassages", () => {
+  it("requests Burmese passages by approximate level", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    const request = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      items: [{ id: "A2#story", text: "မေ ဈေးကို သွားတယ်။", level: "A2", levelApproximate: true, coverage: 0.91, sourceId: "wiki", license: "CC BY-SA 4.0" }],
+    })));
+    vi.stubGlobal("fetch", request);
+
+    const result = await listReadingPassages(session, "my", "A2");
+
+    expect(result.ok).toBe(true);
+    expect(request).toHaveBeenCalledWith("https://api.example.com/reference/readings?lang=my&level=A2&limit=200", {
+      headers: { Authorization: "Bearer access-token" },
+    });
+  });
 });
 
 describe("listVocabulary", () => {
