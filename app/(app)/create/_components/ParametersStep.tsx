@@ -128,16 +128,24 @@ export function ParametersStep({
           onChange={(event) =>
             onChange({ ...params, topic: event.target.value, topicSlug: "" })
           }
-          placeholder="Weekend travel — a trip to Kyoto"
+          placeholder={
+            params.language === "pl"
+              ? "Weekend travel — a trip to Kraków"
+              : "Weekend travel — a trip to Kyoto"
+          }
           value={params.topic}
         />
         {topics.length > 0 ? (
           <>
-            <p className="mt-2.5 text-xs text-ink-3">
-              Or pick a suggestion — the lesson then uses words from that topic
-              you have not covered yet.
+            <p className="mt-2.5 text-xs text-ink-3" id="suggested-topics-label">
+              <span className="font-semibold text-ink-2">Suggested topics</span>
+              {" — "}pick one to prioritize words you have not covered yet.
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <div
+              aria-labelledby="suggested-topics-label"
+              className="mt-2 flex flex-wrap gap-2"
+              role="group"
+            >
               {topics.map((topic) => (
                 <Pill
                   key={topic.slug}
@@ -153,7 +161,7 @@ export function ParametersStep({
                         : "text-[11px] text-ink-3"
                     }
                   >
-                    {topic.coveredCount}/{topic.wordCount}
+                    {topic.coveredCount}/{topic.wordCount} learned
                   </span>
                 </Pill>
               ))}
@@ -168,7 +176,10 @@ export function ParametersStep({
         </legend>
         <div className="flex flex-wrap gap-2">
           {EXERCISE_TYPES.filter(
-            (type) => type.code !== "reading" && type.grading === "auto",
+            (type) =>
+              type.code !== "reading" &&
+              (type.grading === "auto" ||
+                (params.language === "pl" && type.code === "script_practice")),
           ).map((type) => (
             <ChoiceChip
               checked={params.exerciseTypes.includes(type.code)}
@@ -177,7 +188,9 @@ export function ParametersStep({
               onChange={() => toggleType(type.code)}
               type="checkbox"
             >
-              {type.label}
+              {type.code === "script_practice" && params.language === "pl"
+                ? "Orthography practice"
+                : type.label}
             </ChoiceChip>
           ))}
         </div>
@@ -186,7 +199,11 @@ export function ParametersStep({
           best on printed worksheets.
         </p>
         <div className="flex flex-wrap gap-2">
-          {EXERCISE_TYPES.filter((type) => type.grading === "self").map(
+          {EXERCISE_TYPES.filter(
+            (type) =>
+              type.grading === "self" &&
+              !(params.language === "pl" && type.code === "script_practice"),
+          ).map(
             (type) => (
               <ChoiceChip
                 checked={params.exerciseTypes.includes(type.code)}

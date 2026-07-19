@@ -3,6 +3,7 @@ import { ClozeExercise } from "./ClozeExercise";
 import { MatchingExercise } from "./MatchingExercise";
 import { MultipleChoiceExercise } from "./MultipleChoiceExercise";
 import { OrderingExercise } from "./OrderingExercise";
+import { PolishOrthographyExercise } from "./PolishOrthographyExercise";
 import { ReadingExercise } from "./ReadingExercise";
 import { ScriptPracticeExercise } from "./ScriptPracticeExercise";
 import { TranslationExercise } from "./TranslationExercise";
@@ -24,7 +25,12 @@ export function ExerciseRenderer({
     multiple_choice: <MultipleChoiceExercise {...props} />,
     reading: <ReadingExercise {...props} language={language} level={level} />,
     writing_prompt: <WritingExercise {...props} />,
-    script_practice: <ScriptPracticeExercise {...props} language={language} level={level} />,
+    script_practice:
+      language === "pl" ? (
+        <PolishOrthographyExercise {...props} />
+      ) : (
+        <ScriptPracticeExercise {...props} language={language} level={level} />
+      ),
   };
   return <Fragment key={exercise.exerciseId}>{renderers[exercise.type] ?? <p>Unsupported exercise type: {exercise.type}</p>}</Fragment>;
 }

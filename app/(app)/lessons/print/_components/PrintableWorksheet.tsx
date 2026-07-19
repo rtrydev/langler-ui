@@ -39,12 +39,12 @@ export function PrintableWorksheet() {
         <Link href={`/lessons/detail/?id=${state.lesson.lessonId}`}><Button variant="secondary">← Lesson</Button></Link>
         <div className="flex items-center gap-4"><Switch checked={includeAnswers} onChange={(event) => setIncludeAnswers(event.target.checked)}>Include answer key</Switch><Button onClick={() => window.print()}>Print worksheet</Button></div>
       </div>
-      <article className="worksheet-page">
+      <article className="worksheet-page" lang={state.lesson.language}>
         <header className="worksheet-header"><div><h1>{state.lesson.title}</h1><p>{language?.nativeName ?? state.lesson.language} · {levelLabel(state.lesson.language, state.lesson.level)}{state.lesson.topic ? ` · ${state.lesson.topic}` : ""}</p></div><p>Name __________________<br />Date __________________</p></header>
         {state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers={false} exercise={exercise} index={index} key={exercise.exerciseId} />)}
         <footer>Generated with Langler · AI-generated content</footer>
       </article>
-      {includeAnswers ? <article className="worksheet-page worksheet-answer-key"><header className="worksheet-header"><div><span>ANSWER KEY</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers exercise={exercise} index={index} key={exercise.exerciseId} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
+      {includeAnswers ? <article className="worksheet-page worksheet-answer-key" lang={state.lesson.language}><header className="worksheet-header"><div><span>ANSWER KEY</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers exercise={exercise} index={index} key={exercise.exerciseId} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
     </div>
   );
 }

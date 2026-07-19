@@ -221,6 +221,9 @@ ruby rt {
 .worksheet-questions { margin: 1rem 0 0 1.25rem; font-family: var(--font-noto-sans-jp), sans-serif; font-size: .9rem; }
 .worksheet-questions li { margin-bottom: .9rem; break-inside: avoid; }
 .worksheet-options { margin-top: .35rem; white-space: pre-wrap; font-size: .8rem; }
+.worksheet-orthography { margin: .75rem 0 0 1.25rem; font-family: var(--font-sans); font-size: .9rem; }
+.worksheet-orthography li { margin-bottom: 1.1rem; break-inside: avoid; }
+.worksheet-orthography-hint { margin-top: .2rem; color: #666; font-size: .72rem; }
 .worksheet-answer { margin-top: .35rem; color: #333; }
 .worksheet-grids { display: flex; flex-wrap: wrap; gap: .8rem; }
 .worksheet-glyph-group { display: grid; grid-template-columns: repeat(3, 4rem); }
