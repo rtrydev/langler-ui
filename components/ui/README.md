@@ -34,6 +34,7 @@ happens in app code, not here.
 | `ChoiceChip` | boxed radio/checkbox chip (levels, exercise types) |
 | `Progress` | percentage bar |
 | `StepProgress` | one segment per step (player header) |
+| `ScaleStrip` | labelled scale segments with `active` / `struck` states |
 | `MeterBars` | small discrete meter (frequency) |
 | `Callout` | info / success / warning / error message panel |
 | `Tabs` | underline tab row; renders links or buttons |

@@ -14,7 +14,7 @@ import { languageOption, levelLabel } from "@/lib/lesson-catalog";
 type HistoryState =
   | { kind: "loading" }
   | { kind: "error"; message: string }
-  | { kind: "ready"; items: AssessmentSummary[]; guidance: string };
+  | { kind: "ready"; items: AssessmentSummary[] };
 
 function shortDate(value: string): string {
   return new Intl.DateTimeFormat(undefined, {
@@ -34,7 +34,7 @@ export function AssessmentHistory() {
       if (!active) return;
       setState(
         result.ok
-          ? { kind: "ready", items: result.data, guidance: result.guidance }
+          ? { kind: "ready", items: result.data }
           : { kind: "error", message: result.error.message },
       );
     });

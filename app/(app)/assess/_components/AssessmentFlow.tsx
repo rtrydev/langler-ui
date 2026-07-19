@@ -4,10 +4,10 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useSession } from "@/components/SessionContext";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
-import { Heading } from "@/components/ui/Heading";
 import { OptionCard } from "@/components/ui/OptionCard";
 import { StepProgress } from "@/components/ui/StepProgress";
 import {
@@ -18,13 +18,12 @@ import {
 } from "@/lib/api/assessments";
 import { cn } from "@/lib/cn";
 import {
-  LANGUAGES,
   languageOption,
-  levelDescriptor,
   levelLabel,
   type LanguageCode,
-  type LanguageOption,
 } from "@/lib/lesson-catalog";
+import { IntroScreen } from "./IntroScreen";
+import { ResultScreen } from "./ResultScreen";
 
 type FlowState =
   | { kind: "intro" }
@@ -38,12 +37,6 @@ const ITEM_KIND_LABELS: Record<string, string> = {
   vocab: "Vocabulary",
   grammar: "Grammar",
   reading: "Reading",
-};
-
-const LANGUAGE_TEXT: Record<LanguageOption["tone"], string> = {
-  vermilion: "text-vermilion",
-  gold: "text-gold",
-  crimson: "text-crimson",
 };
 
 export function AssessmentFlow() {
@@ -168,9 +161,7 @@ export function AssessmentFlow() {
         <Link aria-label="Exit placement test" className="text-xl text-ink-2 hover:text-ink" href="/">
           ×
         </Link>
-        <span className="rounded-[5px] bg-accent-soft px-2 py-1 text-[11px] font-semibold text-accent">
-          {option?.nativeName ?? state.view.language}
-        </span>
+        <Badge tone="accent">{option?.nativeName ?? state.view.language}</Badge>
         <span className="text-xs text-ink-3">
           Round {stage.index + 1} · {levelLabel(state.view.language, stage.band)}
         </span>
@@ -231,162 +222,6 @@ export function AssessmentFlow() {
           </p>
         </div>
       )}
-    </Card>
-  );
-}
-
-type IntroScreenProps = {
-  language: LanguageCode;
-  message: string;
-  onLanguageChange: (code: LanguageCode) => void;
-  onStart: () => void;
-};
-
-function IntroScreen({ language, message, onLanguageChange, onStart }: IntroScreenProps) {
-  return (
-    <div className="mx-auto max-w-xl">
-      <Heading as="h1" size="lg">
-        Find your level
-      </Heading>
-      <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
-        A short placement test that adapts round by round. Most sessions take
-        5–10 minutes; it ends early once it finds your edge.
-      </p>
-
-      <fieldset className="mt-6">
-        <legend className="mb-2.5 text-[13px] font-semibold">Language</legend>
-        <div className="grid grid-cols-3 gap-3">
-          {LANGUAGES.map((option) => (
-            <OptionCard
-              className="px-2 py-4 text-center"
-              key={option.code}
-              onClick={() => onLanguageChange(option.code)}
-              selected={language === option.code}
-            >
-              <span
-                className={cn(
-                  "block text-2xl leading-snug",
-                  option.code === "ja" && "font-jp-serif",
-                  option.code === "my" && "font-myanmar",
-                  LANGUAGE_TEXT[option.tone],
-                )}
-              >
-                {option.nativeName}
-              </span>
-              <span className="mt-1.5 block text-xs text-ink-2">
-                {option.englishName}
-              </span>
-            </OptionCard>
-          ))}
-        </div>
-      </fieldset>
-
-      <Card className="mt-6" elevation="card">
-        <p className="text-[13.5px] font-semibold">What to expect</p>
-        <ul className="mt-2 grid gap-1.5 text-[13px] leading-relaxed text-ink-2">
-          <li>· Multiple-choice vocabulary, grammar, and reading questions.</li>
-          <li>· Each round steps up a level; the test stops when a round gets hard.</li>
-          <li>· No timer, no penalty for guessing — skip nothing, just answer.</li>
-        </ul>
-      </Card>
-
-      <Callout className="mt-4" tone="info">
-        The result is approximate guidance, not a certification. It pre-fills
-        your lesson level, and you can always override it.
-      </Callout>
-
-      {message ? (
-        <Callout className="mt-4" tone="error">
-          {message}
-        </Callout>
-      ) : null}
-
-      <div className="mt-6">
-        <Button onClick={onStart} size="lg">
-          Start the placement test
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-type ResultScreenProps = {
-  view: AssessmentView;
-  onRetake: () => void;
-};
-
-function ResultScreen({ view, onRetake }: ResultScreenProps) {
-  const result = view.result;
-  const option = languageOption(view.language);
-  if (!result || !option) {
-    return (
-      <div className="mx-auto max-w-xl">
-        <Callout tone="error">This assessment has no result yet.</Callout>
-      </div>
-    );
-  }
-  const tested = new Map(result.bands.map((band) => [band.band, band]));
-  const descriptor = levelDescriptor(result.estimatedLevel);
-
-  return (
-    <Card className="mx-auto max-w-[620px] text-center" padding="lg">
-      <p className="text-[11px] font-semibold tracking-wide text-ink-3 uppercase">
-        Placement complete · {option.englishName}
-      </p>
-      <p className="mt-6 text-sm text-ink-2">
-        {result.floor ? "Start from the beginning at" : "Your estimated level is"}
-      </p>
-      <p className="mt-2 text-4xl font-bold text-ink sm:text-5xl">
-        ≈ {levelLabel(view.language, result.estimatedLevel)}
-      </p>
-      {descriptor ? (
-        <p className="mt-1.5 text-sm text-ink-2">{descriptor}</p>
-      ) : null}
-
-      <div className="mx-auto mt-6 flex max-w-sm gap-[5px]">
-        {option.levels.map((band) => {
-          const outcome = tested.get(band);
-          const estimated = band === result.estimatedLevel;
-          return (
-            <span
-              className={cn(
-                "flex-1 rounded-[5px] border py-1.5 text-[11px] font-semibold",
-                estimated
-                  ? "border-accent bg-accent-soft text-accent"
-                  : "border-line text-ink-3",
-                outcome && !estimated && !outcome.passed && "line-through opacity-70",
-              )}
-              key={band}
-            >
-              {band}
-            </span>
-          );
-        })}
-      </div>
-      <p className="mt-2 text-[11px] text-ink-3">
-        {result.bands
-          .map((band) => `${band.band} ${band.correct}/${band.total}`)
-          .join(" · ")}{" "}
-        · {result.confidence} confidence
-      </p>
-
-      <p className="mx-auto mt-5 max-w-md text-[13px] leading-relaxed text-ink-2">
-        {view.guidance}
-      </p>
-
-      <Callout className="mt-5 text-left" tone="success">
-        This estimate now pre-fills your lesson level. You can change it any
-        time you create a lesson.
-      </Callout>
-
-      <div className="mt-6 flex justify-center gap-3">
-        <Button onClick={onRetake} variant="secondary">
-          Retake
-        </Button>
-        <Link href="/create/">
-          <Button>Save &amp; continue</Button>
-        </Link>
-      </div>
     </Card>
   );
 }
