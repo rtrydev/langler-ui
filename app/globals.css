@@ -233,6 +233,15 @@ ruby rt {
 .worksheet-stroke-hint { width: 4rem; height: 4rem; border: 1px solid #555; }
 .worksheet-page footer { margin-top: 2.75rem; padding-top: .75rem; border-top: 1px solid #ddd; color: #777; font-family: var(--font-sans); font-size: .62rem; text-align: center; }
 .worksheet-answer-key { break-before: page; }
+.worksheet-page[lang="my"] .worksheet-japanese,
+.worksheet-page[lang="my"] .worksheet-passage,
+.worksheet-page[lang="my"] .worksheet-tokens,
+.worksheet-page[lang="my"] .worksheet-matching,
+.worksheet-page[lang="my"] .worksheet-questions,
+.worksheet-page[lang="my"] .worksheet-model { font-family: var(--font-noto-sans-myanmar), sans-serif; }
+.worksheet-page[lang="my"] .worksheet-japanese,
+.worksheet-page[lang="my"] .worksheet-passage { line-height: 2.65; }
+.worksheet-page[lang="my"] ruby rt { font-family: var(--font-sans); font-size: .42em; }
 
 @page { size: A4; margin: 13mm; }
 

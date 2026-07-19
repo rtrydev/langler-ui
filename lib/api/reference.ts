@@ -22,6 +22,16 @@ export type ScriptGlyph = {
   strokeDataRef?: string;
 };
 
+export type ReadingPassage = {
+  id: string;
+  text: string;
+  level: string;
+  levelApproximate: boolean;
+  coverage: number;
+  sourceId: string;
+  license: string;
+};
+
 export type ReferenceResult<T> =
   | { ok: true; data: T[] }
   | { ok: false; message: string };
@@ -94,9 +104,22 @@ export function listScriptGlyphs(
   language: string,
   level: string,
 ): Promise<ReferenceResult<ScriptGlyph>> {
-  return referenceCollection(session, "/reference/scripts", new URLSearchParams({
+  const params = new URLSearchParams({
     lang: language,
-    type: "kanji",
+    type: language === "my" ? "burmese" : "kanji",
+    limit: "200",
+  });
+  if (language !== "my") params.set("level", level);
+  return referenceCollection(session, "/reference/scripts", params);
+}
+
+export function listReadingPassages(
+  session: AuthSession,
+  language: string,
+  level: string,
+): Promise<ReferenceResult<ReadingPassage>> {
+  return referenceCollection(session, "/reference/readings", new URLSearchParams({
+    lang: language,
     level,
     limit: "200",
   }));
