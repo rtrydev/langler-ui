@@ -4,6 +4,7 @@ import type {
   ExerciseQuestion,
   LessonExercise,
   LessonResultDocument,
+  ScriptPracticeItem,
 } from "@/lib/api/lessons";
 
 export function normalizeAnswer(value: string): string {
@@ -107,6 +108,26 @@ export function gradeMultipleChoice(
     (question, index) => responses[index] === question.answer,
   ).length;
   return autoOutcome(exercise, correct, questions.length);
+}
+
+export function gradeOrthography(
+  exercise: LessonExercise,
+  responses: Record<number, string>,
+): ExerciseOutcome {
+  const items = orthographyItems(exercise);
+  const correct = items.filter(
+    (item, index) => item.answer && matchesAnswer(responses[index] ?? "", [item.answer]),
+  ).length;
+  return autoOutcome(exercise, correct, items.length);
+}
+
+export function orthographyItems(exercise: LessonExercise): ScriptPracticeItem[] {
+  return (exercise.payload?.items ?? []).filter(
+    (item): item is ScriptPracticeItem =>
+      typeof item !== "string" &&
+      (item.kind === "choice" || item.kind === "dictation") &&
+      Boolean(item.answer),
+  );
 }
 
 export function selfOutcome(

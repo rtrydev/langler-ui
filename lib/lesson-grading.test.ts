@@ -4,6 +4,7 @@ import {
   gradeMatching,
   gradeMultipleChoice,
   gradeOrdering,
+  gradeOrthography,
   gradeReading,
   matchesAnswer,
   seededShuffle,
@@ -92,6 +93,25 @@ describe("lesson grading", () => {
       },
     };
     expect(gradeMultipleChoice(exercise, { 0: "went", 1: "fire", 2: "a" })).toEqual(
+      expect.objectContaining({ grading: "auto", correct: 2, total: 3, score: 4 }),
+    );
+  });
+
+  it("grades Polish orthography choices and typed answers", () => {
+    const exercise: LessonExercise = {
+      exerciseId: "ort-1",
+      type: "script_practice",
+      points: 6,
+      payload: {
+        items: [
+          { kind: "choice", glyph: "Monarch", options: ["król", "krul"], answer: "król" },
+          { kind: "dictation", glyph: "Sea", answer: "morze" },
+          { kind: "dictation", glyph: "Tea", answer: "herbata" },
+        ],
+      },
+    };
+
+    expect(gradeOrthography(exercise, { 0: "król", 1: " MORZE ", 2: "cherbata" })).toEqual(
       expect.objectContaining({ grading: "auto", correct: 2, total: 3, score: 4 }),
     );
   });

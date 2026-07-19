@@ -9,6 +9,8 @@ export type VocabEntry = {
   gloss: string[];
   pos: string[];
   level: string;
+  levelApproximate?: boolean;
+  freqBand?: number;
 };
 
 export type ScriptGlyph = {

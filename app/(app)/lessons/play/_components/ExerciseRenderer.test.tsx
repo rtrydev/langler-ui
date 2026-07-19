@@ -81,4 +81,36 @@ describe("ExerciseRenderer", () => {
       expect.objectContaining({ exerciseId: "cloze-bank", score: 2, correct: 2, total: 2 }),
     );
   });
+
+  it("plays Polish orthography as an auto-graded exercise", () => {
+    const onComplete = vi.fn();
+    const exercise: LessonExercise = {
+      exerciseId: "ort-1",
+      type: "script_practice",
+      points: 4,
+      payload: {
+        items: [
+          {
+            kind: "choice",
+            glyph: "Wybierz poprawną pisownię.",
+            options: ["król", "krul"],
+            answer: "król",
+          },
+          { kind: "dictation", glyph: "Nakrycie budynku", answer: "dach" },
+        ],
+      },
+    };
+    render(<ExerciseRenderer exercise={exercise} language="pl" level="A2" onComplete={onComplete} />);
+
+    fireEvent.click(screen.getByText("król"));
+    fireEvent.change(screen.getByRole("textbox", { name: "Orthography answer 2" }), {
+      target: { value: "dach" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Check" }));
+    expect(screen.getByText("2 of 2 spellings correct.")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Next →" }));
+    expect(onComplete).toHaveBeenCalledWith(
+      expect.objectContaining({ exerciseId: "ort-1", grading: "auto", score: 4, total: 2 }),
+    );
+  });
 });

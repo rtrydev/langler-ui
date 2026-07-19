@@ -97,7 +97,7 @@ export type ExercisePayload = {
   wordBank?: string[];
   source?: string;
   reference?: string;
-  items?: Array<string | { glyph: string; reading?: string; meaning?: string }>;
+  items?: Array<string | ScriptPracticeItem>;
   translation?: string;
   pairs?: Array<{ left: string; right: string }>;
   genre?: string;
@@ -107,6 +107,15 @@ export type ExercisePayload = {
   questions?: ExerciseQuestion[];
   guidance?: string;
   modelAnswer?: string;
+};
+
+export type ScriptPracticeItem = {
+  glyph?: string;
+  reading?: string;
+  meaning?: string;
+  kind?: "choice" | "dictation";
+  answer?: string;
+  options?: string[];
 };
 
 export type LessonExercise = {
