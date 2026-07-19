@@ -4,9 +4,11 @@ import { AuthBrand } from "./AuthBrand";
 
 describe("AuthBrand", () => {
   it("renders the designer brand lockup", () => {
-    render(<AuthBrand />);
+    const { container } = render(<AuthBrand />);
 
-    expect(screen.getByText("語").className).toContain("bg-accent");
+    expect(container.querySelector("img")?.getAttribute("src")).toContain(
+      "langler-mark.png",
+    );
     expect(screen.getByText("Langler").className).toContain("font-bold");
     expect(
       screen.getByText("Your languages. Your AI. One notebook."),

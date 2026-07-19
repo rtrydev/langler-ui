@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { BrandMark } from "@/components/BrandMark";
 import { Button } from "@/components/ui/Button";
 import { clearSession } from "@/lib/auth/cognito";
 import { cn } from "@/lib/cn";
@@ -61,12 +62,7 @@ function NavIcon({ path, active }: { path: string; active: boolean }) {
 function Wordmark() {
   return (
     <span className="flex items-center gap-2.5">
-      <span
-        aria-hidden
-        className="grid size-7 place-items-center rounded-[7px] bg-accent font-serif text-[15px] font-bold text-on-accent"
-      >
-        語
-      </span>
+      <BrandMark size={28} />
       <span className="text-lg font-bold tracking-tight text-ink">Langler</span>
     </span>
   );
