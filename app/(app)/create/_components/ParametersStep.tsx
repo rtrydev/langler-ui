@@ -172,8 +172,9 @@ export function ParametersStep({
                   </span>
                 </p>
                 <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">
-                  Ends the lesson with a short, level-appropriate story that
-                  ties the new words and grammar together.
+                  Opens the lesson with a short, level-appropriate story that
+                  introduces the new words and grammar in context before the
+                  exercises practice them.
                 </p>
               </div>
             </div>

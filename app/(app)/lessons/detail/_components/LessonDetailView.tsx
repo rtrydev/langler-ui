@@ -223,7 +223,7 @@ export function LessonDetailView() {
           ◆
         </span>
         {story
-          ? "This lesson culminates in a short story."
+          ? "This lesson opens with a short story that introduces the new words in context."
           : "Connected reading begins in a later lesson."}
       </p>
 
