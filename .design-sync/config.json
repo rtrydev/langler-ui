@@ -1,0 +1,12 @@
+{
+  "projectId": "60689405-7192-43ea-86e2-f28f5a762919",
+  "shape": "package",
+  "pkg": "langler-ui",
+  "globalName": "LanglerUI",
+  "buildCmd": "npm run build && node .design-sync/collect-css.mjs && node .design-sync/emit-types.mjs",
+  "srcDir": "components/ui",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".design-sync/.cache/css/chunks/ds-globals.css",
+  "extraFonts": [".design-sync/.cache/css/chunks/ds-fonts.css"],
+  "readmeHeader": ".design-sync/conventions.md"
+}

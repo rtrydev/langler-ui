@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": ".cache/types",
+    "rootDir": "..",
+    "incremental": false
+  },
+  "include": ["../components/ui/**/*.tsx", "../lib/cn.ts"],
+  "exclude": ["../components/ui/**/*.test.tsx"]
+}
