@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import type { LessonExercise, ScriptPracticeItem } from "@/lib/api/lessons";
 import { kanjiVGReference, strokeAssetUrl } from "@/lib/api/reference";
-import { exerciseTypeLabel } from "@/lib/lesson-catalog";
+import { EXERCISE_TYPES, exerciseTypeLabel } from "@/lib/lesson-catalog";
 import { seededShuffle } from "@/lib/lesson-grading";
 import { ClozePrint } from "./ClozePrint";
+
+const KNOWN_EXERCISE_TYPES: Set<string> = new Set(EXERCISE_TYPES.map((type) => type.code));
 
 export function WorksheetExercise({ exercise, index, answers, annotations, language }: { exercise: LessonExercise; index: number; answers: boolean; annotations: boolean; language: string }) {
   const payload = exercise.payload;
@@ -26,8 +28,9 @@ export function WorksheetExercise({ exercise, index, answers, annotations, langu
       {exercise.type === "script_practice" && !orthography ? <div className="worksheet-grids">{practiceItems.filter((item): item is ScriptPracticeItem & { glyph: string } => Boolean(item.glyph)).map((item, itemIndex) => {
         const reference = language === "ja" ? kanjiVGReference(item.glyph) : undefined;
         const asset = reference ? strokeAssetUrl(reference) : undefined;
-        return <div className="worksheet-glyph-group" key={`${item.glyph}-${itemIndex}`}>{asset ? <object aria-label={`Stroke order for ${item.glyph}`} className="worksheet-stroke-hint" data={asset} type="image/svg+xml" /> : <div className="worksheet-grid worksheet-model">{item.glyph}</div>}<div className="worksheet-grid" /><div className="worksheet-grid" /><p>{item.reading}{item.meaning ? ` · ${item.meaning}` : ""} · stroke-order hint</p></div>;
+        return <div className="worksheet-glyph-group" key={`${item.glyph}-${itemIndex}`}>{asset ? <object aria-label={`Stroke order for ${item.glyph}`} className="worksheet-stroke-hint" data={asset} type="image/svg+xml" /> : <div className="worksheet-grid worksheet-model">{item.glyph}</div>}<div className="worksheet-grid" /><div className="worksheet-grid" /><p>{item.reading}{item.meaning ? ` · ${item.meaning}` : ""} · {asset ? "stroke-order hint" : "trace the reference glyph"}</p></div>;
       })}</div> : null}
+      {!KNOWN_EXERCISE_TYPES.has(exercise.type) ? <p className="worksheet-instruction">Unsupported exercise type: {exercise.type}</p> : null}
     </section>
   );
 }

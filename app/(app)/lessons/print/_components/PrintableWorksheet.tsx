@@ -45,7 +45,7 @@ export function PrintableWorksheet() {
         {state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers={false} annotations={includeAnnotations} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}
         <footer>Generated with Langler · AI-generated content</footer>
       </article>
-      {includeAnswers ? <article className="worksheet-page worksheet-answer-key" lang={state.lesson.language}><header className="worksheet-header"><div><span>ANSWER KEY</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers annotations={includeAnnotations} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
+      {includeAnswers ? <article className="worksheet-page worksheet-answer-key" lang={state.lesson.language}><header className="worksheet-header"><div><span className="worksheet-answer-key-badge">Answer key</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers annotations={includeAnnotations} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
     </div>
   );
 }

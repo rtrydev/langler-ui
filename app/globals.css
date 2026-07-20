@@ -224,7 +224,8 @@ ruby rt {
 .worksheet-orthography { margin: .75rem 0 0 1.25rem; font-family: var(--font-sans); font-size: .9rem; }
 .worksheet-orthography li { margin-bottom: 1.1rem; break-inside: avoid; }
 .worksheet-orthography-hint { margin-top: .2rem; color: #666; font-size: .72rem; }
-.worksheet-answer { margin-top: .35rem; color: #333; }
+.worksheet-answer { margin-top: .35rem; font-weight: 600; color: #333; }
+.worksheet-answer-key-badge { display: inline-block; margin-bottom: .3rem; padding: .15rem .5rem; border: 1px solid #161412; border-radius: 999px; font-family: var(--font-sans); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .worksheet-grids { display: flex; flex-wrap: wrap; gap: .8rem; }
 .worksheet-glyph-group { display: grid; grid-template-columns: repeat(3, 4rem); }
 .worksheet-glyph-group p { grid-column: 1 / -1; margin-top: .25rem; font-family: var(--font-sans); font-size: .67rem; }
@@ -242,6 +243,11 @@ ruby rt {
 .worksheet-page[lang="my"] .worksheet-japanese,
 .worksheet-page[lang="my"] .worksheet-passage { line-height: 2.65; }
 .worksheet-page[lang="my"] ruby rt { font-family: var(--font-sans); font-size: .42em; }
+.worksheet-page[lang="my"] .worksheet-grid { width: 4.6rem; height: 4.6rem; }
+.worksheet-page[lang="my"] .worksheet-model { font-size: 3.4rem; }
+.worksheet-page[lang="my"] .worksheet-glyph-group { grid-template-columns: repeat(3, 4.6rem); }
+.worksheet-page[lang="pl"] .worksheet-orthography { font-size: 1.05rem; letter-spacing: .015em; }
+.worksheet-page[lang="pl"] .worksheet-orthography li p:first-child { font-weight: 600; }
 
 @page { size: A4; margin: 13mm; }
 

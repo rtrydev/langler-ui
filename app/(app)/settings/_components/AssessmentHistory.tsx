@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Overline } from "@/components/ui/Overline";
 import { listAssessments, type AssessmentSummary } from "@/lib/api/assessments";
 import { languageOption, levelLabel } from "@/lib/lesson-catalog";
@@ -72,12 +73,10 @@ export function AssessmentHistory() {
 
       {state.kind === "ready" && state.items.length === 0 ? (
         <Card dashed>
-          <p className="text-sm font-semibold text-accent">
-            No placement tests yet.
-          </p>
-          <p className="mt-1 text-[13px] text-accent-strong">
-            Take one to stop guessing what &quot;intermediate&quot; means.
-          </p>
+          <EmptyState
+            description={'Take one to stop guessing what "intermediate" means.'}
+            title="No placement tests yet"
+          />
         </Card>
       ) : null}
 

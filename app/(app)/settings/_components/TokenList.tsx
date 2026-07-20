@@ -2,6 +2,7 @@
 
 import { Badge, type BadgeTone } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { EmptyState } from "@/components/ui/EmptyState";
 import type { AgentToken } from "@/lib/api/agent-tokens";
 
 const dateFormat = new Intl.DateTimeFormat(undefined, {
@@ -26,9 +27,10 @@ export function TokenList({
 }) {
   if (tokens.length === 0) {
     return (
-      <p className="px-5 py-8 text-center text-sm text-ink-2">
-        No agent tokens yet.
-      </p>
+      <EmptyState
+        description="Create one below to connect an AI harness to your library."
+        title="No agent tokens yet"
+      />
     );
   }
   return (

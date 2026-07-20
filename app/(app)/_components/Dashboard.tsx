@@ -6,6 +6,7 @@ import { useSession } from "@/components/SessionContext";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Heading } from "@/components/ui/Heading";
 import { Overline } from "@/components/ui/Overline";
 import { StatusDot } from "@/components/ui/StatusDot";
@@ -175,15 +176,16 @@ export function Dashboard() {
         </div>
       ) : (
         <Card dashed>
-          <p className="text-sm font-semibold text-accent">Your first result will appear here.</p>
-          <p className="mt-1 text-[13px] text-accent-strong">
-            Open a lesson when you&apos;re ready to study.
-          </p>
-          <Link className="mt-4 inline-block" href="/lessons/">
-            <Button size="sm" variant="accent">
-              Browse lessons
-            </Button>
-          </Link>
+          <EmptyState
+            description="Open a lesson when you're ready to study."
+            title="Your first result will appear here"
+          >
+            <Link href="/lessons/">
+              <Button size="sm" variant="accent">
+                Browse lessons
+              </Button>
+            </Link>
+          </EmptyState>
         </Card>
       )}
 
