@@ -28,6 +28,11 @@ const NAV_ITEMS = [
     icon: "M8 5h11v11M4 8h11v11H4z",
   },
   {
+    href: "/glossary/",
+    label: "Glossary",
+    icon: "M4 6h16M4 10h10M4 14h16M4 18h8",
+  },
+  {
     href: "/settings/",
     label: "Settings",
     icon: "M4 8h16M4 16h16M9 8V6m0 4V8m6 8v2m0-6v6",
