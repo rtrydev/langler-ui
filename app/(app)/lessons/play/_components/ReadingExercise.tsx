@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { JapaneseReader } from "@/components/JapaneseReader";
 import { BurmeseReader } from "@/components/BurmeseReader";
+import { Glossary } from "@/components/Glossary";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Input } from "@/components/ui/Input";
@@ -28,7 +29,7 @@ export function ReadingExercise({
   const outcome = gradeReading(exercise, responses);
 
   useEffect(() => {
-    if (language !== "ja" && language !== "my") return;
+    if (language !== "ja") return;
     let active = true;
     listVocabulary(session, language, level).then((result) => {
       if (active && result.ok) setVocabulary(result.data);
@@ -45,16 +46,16 @@ export function ReadingExercise({
             <h2 className="mt-1 font-jp-serif text-2xl font-semibold">{exercise.payload?.title}</h2>
           </div>
           {language === "ja" ? <Switch checked={showReadings} onChange={(event) => setShowReadings(event.target.checked)}>Furigana</Switch> : null}
-          {language === "my" ? <Switch checked={showReadings} onChange={(event) => setShowReadings(event.target.checked)}>Romanization</Switch> : null}
         </div>
         {language === "ja" ? (
           <JapaneseReader annotations={exercise.payload?.annotations} passage={exercise.payload?.passage ?? ""} showReadings={showReadings} vocabulary={vocabulary} />
         ) : language === "my" ? (
-          <BurmeseReader annotations={exercise.payload?.annotations} passage={exercise.payload?.passage ?? ""} showReadings={showReadings} vocabulary={vocabulary} />
+          <BurmeseReader passage={exercise.payload?.passage ?? ""} />
         ) : (
           <div className="space-y-5 font-serif text-xl leading-[2.1]">{(exercise.payload?.passage ?? "").split(/\n+/).map((paragraph, index) => <p key={`${paragraph.slice(0, 12)}-${index}`}>{paragraph}</p>)}</div>
         )}
-        {language === "ja" || language === "my" ? <p className="mt-5 text-xs italic text-ink-3">Tap a dotted word for its reference definition.</p> : null}
+        {language === "ja" ? <p className="mt-5 text-xs italic text-ink-3">Tap a dotted word for its reference definition.</p> : null}
+        <Glossary annotations={exercise.payload?.annotations} language={language} />
       </article>
       <section aria-label="Comprehension questions" className="mt-7 border-t border-line-2 pt-7 lg:mt-0 lg:max-h-[62vh] lg:overflow-y-auto lg:border-t-0 lg:bg-paper lg:px-7 lg:pt-0">
         <div className="grid gap-7">

@@ -38,7 +38,9 @@ describe("ReadingExercise", () => {
     };
     const onComplete = renderReading(exercise, "ja", "N5");
 
-    expect(screen.getByText("きょうと")).toBeTruthy();
+    expect(screen.getAllByText("きょうと").length).toBeGreaterThan(0);
+    const glossaryJa = screen.getByLabelText("Vocabulary");
+    expect(within(glossaryJa).getByText("Kyoto")).toBeTruthy();
     fireEvent.click(screen.getByRole("switch", { name: "Furigana" }));
     const questionsJa = screen.getByLabelText("Comprehension questions");
     fireEvent.click(within(questionsJa).getByText("京都"));
@@ -48,7 +50,7 @@ describe("ReadingExercise", () => {
     expect(onComplete).toHaveBeenCalledWith(expect.objectContaining({ correct: 1, total: 1 }));
   });
 
-  it("renders Burmese romanization annotations and grades a connected story", () => {
+  it("renders a Burmese story with a vocabulary glossary and grades comprehension", () => {
     const exercise: LessonExercise = {
       exerciseId: "story-my",
       type: "reading",
@@ -65,7 +67,10 @@ describe("ReadingExercise", () => {
     };
     const onComplete = renderReading(exercise, "my", "A1");
 
-    expect(screen.getByRole("switch", { name: "Romanization" })).toBeTruthy();
+    expect(screen.queryByRole("switch", { name: "Romanization" })).toBeNull();
+    const glossary = screen.getByLabelText("Vocabulary");
+    expect(within(glossary).getByText("school")).toBeTruthy();
+    expect(within(glossary).getByText("kyaung:")).toBeTruthy();
     const questionsMy = screen.getByLabelText("Comprehension questions");
     fireEvent.click(within(questionsMy).getByText("ကျောင်း"));
     fireEvent.click(screen.getByRole("button", { name: "Check" }));
@@ -83,6 +88,7 @@ describe("ReadingExercise", () => {
         genre: "short_story",
         title: "Weekend w Krakowie",
         passage: "Pojechałam do Krakowa.",
+        annotations: [{ surface: "pojechać", reading: "po-ye-hach", gloss: "to go (by vehicle)" }],
         questions: [
           { question: "Dokąd pojechała autorka?", kind: "multiple_choice", options: ["do Krakowa", "do Warszawy"], answer: "do Krakowa" },
         ],
@@ -91,6 +97,7 @@ describe("ReadingExercise", () => {
     const onComplete = renderReading(exercise, "pl", "A2");
 
     expect(screen.getByText("Pojechałam do Krakowa.")).toBeTruthy();
+    expect(within(screen.getByLabelText("Vocabulary")).getByText("to go (by vehicle)")).toBeTruthy();
     fireEvent.click(screen.getByText("do Krakowa"));
     fireEvent.click(screen.getByRole("button", { name: "Check" }));
     expect(screen.getByText("1 of 1 gradable answers correct.")).toBeTruthy();

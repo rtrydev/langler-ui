@@ -17,7 +17,6 @@ export function PrintableWorksheet() {
   const session = useSession();
   const lessonId = useSearchParams().get("id") ?? "";
   const [includeAnswers, setIncludeAnswers] = useState(false);
-  const [includeAnnotations, setIncludeAnnotations] = useState(true);
   const [state, setState] = useState<PrintState>({ kind: "loading" });
 
   useEffect(() => {
@@ -38,14 +37,14 @@ export function PrintableWorksheet() {
     <div className="print-workspace">
       <div className="print-toolbar mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4">
         <Link href={`/lessons/detail/?id=${state.lesson.lessonId}`}><Button variant="secondary">← Lesson</Button></Link>
-        <div className="flex items-center gap-4">{state.lesson.language === "my" ? <Switch checked={includeAnnotations} onChange={(event) => setIncludeAnnotations(event.target.checked)}>Burmese romanization</Switch> : null}<Switch checked={includeAnswers} onChange={(event) => setIncludeAnswers(event.target.checked)}>Include answer key</Switch><Button onClick={() => window.print()}>Print worksheet</Button></div>
+        <div className="flex items-center gap-4"><Switch checked={includeAnswers} onChange={(event) => setIncludeAnswers(event.target.checked)}>Include answer key</Switch><Button onClick={() => window.print()}>Print worksheet</Button></div>
       </div>
       <article className="worksheet-page" lang={state.lesson.language}>
         <header className="worksheet-header"><div><h1>{state.lesson.title}</h1><p>{language?.nativeName ?? state.lesson.language} · {levelLabel(state.lesson.language, state.lesson.level)}{state.lesson.topic ? ` · ${state.lesson.topic}` : ""}</p></div><p>Name __________________<br />Date __________________</p></header>
-        {state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers={false} annotations={includeAnnotations} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}
+        {state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers={false} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}
         <footer>Generated with Langler · AI-generated content</footer>
       </article>
-      {includeAnswers ? <article className="worksheet-page worksheet-answer-key" lang={state.lesson.language}><header className="worksheet-header"><div><span className="worksheet-answer-key-badge">Answer key</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers annotations={includeAnnotations} exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
+      {includeAnswers ? <article className="worksheet-page worksheet-answer-key" lang={state.lesson.language}><header className="worksheet-header"><div><span className="worksheet-answer-key-badge">Answer key</span><h1>{state.lesson.title}</h1></div></header>{state.lesson.exercises.map((exercise, index) => <WorksheetExercise answers exercise={exercise} index={index} key={exercise.exerciseId} language={state.lesson.language} />)}<footer>Generated with Langler · Answer key</footer></article> : null}
     </div>
   );
 }
