@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Disclosure } from "@/components/ui/Disclosure";
 import { ChoiceChip } from "@/components/ui/ChoiceChip";
 import { FieldMessage } from "@/components/ui/FieldMessage";
 import { Input } from "@/components/ui/Input";
@@ -19,6 +20,8 @@ import {
   type LanguageOption,
 } from "@/lib/lesson-catalog";
 import type { WizardParams } from "./CreateLessonWizard";
+
+const FEATURED_TOPICS = 8;
 
 type ParametersStepProps = {
   params: WizardParams;
@@ -51,6 +54,29 @@ export function ParametersStep({
       return;
     }
     onChange({ ...params, topic: topic.name, topicSlug: topic.slug });
+  }
+
+  function renderTopic(topic: LessonTopic) {
+    const selected = params.topicSlug === topic.slug;
+    return (
+      <Pill
+        key={topic.slug}
+        onClick={() => selectTopic(topic)}
+        selected={selected}
+        title={topic.description}
+      >
+        {topic.name}
+        <span
+          className={
+            selected
+              ? "text-[11px] font-normal opacity-80"
+              : "text-[11px] text-ink-3"
+          }
+        >
+          {topic.coveredCount}/{topic.wordCount} learned
+        </span>
+      </Pill>
+    );
   }
 
   function toggleType(code: string) {
@@ -145,28 +171,21 @@ export function ParametersStep({
             </p>
             <div
               aria-labelledby="suggested-topics-label"
-              className="mt-2 flex flex-wrap gap-2"
+              className="mt-2 grid gap-2"
               role="group"
             >
-              {topics.map((topic) => (
-                <Pill
-                  key={topic.slug}
-                  onClick={() => selectTopic(topic)}
-                  selected={params.topicSlug === topic.slug}
-                  title={topic.description}
+              <div className="flex flex-wrap gap-2">
+                {topics.slice(0, FEATURED_TOPICS).map(renderTopic)}
+              </div>
+              {topics.length > FEATURED_TOPICS ? (
+                <Disclosure
+                  summary={`Show ${topics.length - FEATURED_TOPICS} more topics`}
                 >
-                  {topic.name}
-                  <span
-                    className={
-                      params.topicSlug === topic.slug
-                        ? "text-[11px] font-normal opacity-80"
-                        : "text-[11px] text-ink-3"
-                    }
-                  >
-                    {topic.coveredCount}/{topic.wordCount} learned
-                  </span>
-                </Pill>
-              ))}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {topics.slice(FEATURED_TOPICS).map(renderTopic)}
+                  </div>
+                </Disclosure>
+              ) : null}
             </div>
           </>
         ) : null}

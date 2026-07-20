@@ -50,6 +50,53 @@ describe("ParametersStep topics", () => {
     });
   });
 
+  it("keeps the least-covered topics visible and folds the rest away", () => {
+    const topics = Array.from({ length: 23 }, (_, index) => ({
+      slug: `topic-${index}`,
+      name: `Topic ${index}`,
+      description: `Description ${index}`,
+      wordCount: 40,
+      coveredCount: index,
+    }));
+    render(
+      <ParametersStep
+        error=""
+        estimatedLevels={{}}
+        onChange={vi.fn()}
+        onNext={vi.fn()}
+        params={params}
+        topics={topics}
+      />,
+    );
+
+    expect(screen.getAllByRole("button", { name: /learned/i })).toHaveLength(23);
+    expect(screen.getByText("Show 15 more topics")).toBeTruthy();
+    expect(screen.getByRole("group", { name: /Suggested topics/i })).toBeTruthy();
+  });
+
+  it("does not offer a disclosure when every topic fits", () => {
+    render(
+      <ParametersStep
+        error=""
+        estimatedLevels={{}}
+        onChange={vi.fn()}
+        onNext={vi.fn()}
+        params={params}
+        topics={[
+          {
+            slug: "food-dining",
+            name: "Food & dining",
+            description: "Meals and cooking",
+            wordCount: 41,
+            coveredCount: 12,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByText(/more topics/i)).toBeNull();
+  });
+
   it("clears a curated slug when the learner enters a custom topic", () => {
     const onChange = vi.fn();
     render(

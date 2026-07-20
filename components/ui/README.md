@@ -38,6 +38,7 @@ happens in app code, not here.
 | `MeterBars` | small discrete meter (frequency) |
 | `Callout` | info / success / warning / error message panel |
 | `Tabs` | underline tab row; renders links or buttons |
+| `Disclosure` | CSS-only show/hide over native `<details>`; takes a `summary` |
 | `Heading` / `Overline` | tracking-tight titles; uppercase section labels |
 | `Divider` | hairline rule |
 | `StatusDot` / `StatusCircle` | colored dot; round glyph bubble (✓ ✕ ◐) |
