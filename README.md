@@ -37,6 +37,13 @@ boundaries against lesson annotations and reference vocabulary, and provides
 tap-to-define plus learner-controlled romanization. Printable Burmese worksheets
 use the Myanmar font and expanded line height, with an optional romanization layer.
 
+## Agent harness
+
+`/connect/` generates a downloadable Claude Code skill, OpenAPI 3.1 spec, and
+optional MCP server (all built from `lib/harness.ts`) so a user's own AI
+agent can query reference data and import lessons via the machine API. See
+`docs/harness-setup.md` for the full setup walkthrough and troubleshooting.
+
 ## Constraints of static export
 
 - No SSR/middleware/server actions; entity pages (e.g. lessons) use query params / client-side routing, not per-ID pre-rendering.
