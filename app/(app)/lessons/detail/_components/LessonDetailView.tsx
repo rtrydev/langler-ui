@@ -306,7 +306,7 @@ export function LessonDetailView() {
               </Button>
             </Link>
             <Link href={`/lessons/print/?id=${lesson.lessonId}`}>
-              <Button fullWidth variant="secondary">
+              <Button fullWidth size="lg" variant="secondary">
                 Print worksheet
               </Button>
             </Link>

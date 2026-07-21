@@ -66,12 +66,18 @@ function NavIcon({ path, active }: { path: string; active: boolean }) {
 
 function Wordmark() {
   return (
-    <span className="flex items-center gap-2.5">
+    // Deliberately a plain anchor, not next/link: the brand always performs a
+    // full reload back to the home page.
+    // eslint-disable-next-line @next/next/no-html-link-for-pages
+    <a
+      className="flex items-center gap-2.5 rounded-md transition-opacity hover:opacity-80 focus-visible:shadow-ring focus-visible:outline-none"
+      href="/"
+    >
       <BrandMark size={28} />
       <span className="font-display text-lg font-semibold tracking-tight text-ink">
         Langler
       </span>
-    </span>
+    </a>
   );
 }
 
@@ -110,7 +116,10 @@ export function AppShell({ children }: AppShellProps) {
         </div>
       </nav>
 
-      <div className="flex h-full min-h-0 flex-1 flex-col print:block print:h-auto">
+      {/* min-w-0: without it, one unbreakable text run (e.g. a long spaceless
+          Burmese phrase iOS can't dictionary-break) propagates min-content
+          width and pushes this flex column past the viewport. */}
+      <div className="flex h-full min-h-0 min-w-0 flex-1 flex-col print:block print:h-auto">
         <header className="flex shrink-0 items-center justify-between gap-3 border-b border-line bg-paper px-5 pt-[calc(env(safe-area-inset-top)+0.75rem)] pb-3 md:hidden">
           <Wordmark />
           <Link
