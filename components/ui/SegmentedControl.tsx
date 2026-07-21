@@ -31,7 +31,13 @@ export function SegmentedControl({
       )}
     >
       {options.map((option) => (
-        <label key={option.value} className="cursor-pointer touch-manipulation">
+        // relative anchors the sr-only (absolute) input inside the label;
+        // otherwise it resolves against the fixed app shell and its far-away
+        // box makes the browser scroll-jump the shell on focus.
+        <label
+          key={option.value}
+          className="relative cursor-pointer touch-manipulation"
+        >
           <input
             type="radio"
             className="peer sr-only"

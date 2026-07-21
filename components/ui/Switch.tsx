@@ -9,7 +9,7 @@ export function Switch({ className, children, ...props }: SwitchProps) {
   return (
     <label
       className={cn(
-        "inline-flex cursor-pointer touch-manipulation items-center gap-2 text-[13px] text-ink-2",
+        "relative inline-flex cursor-pointer touch-manipulation items-center gap-2 text-[13px] text-ink-2",
         className,
       )}
     >

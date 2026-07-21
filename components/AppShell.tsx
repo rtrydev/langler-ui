@@ -126,7 +126,10 @@ export function AppShell({ children }: AppShellProps) {
         </header>
 
         <main className="paper-grid min-h-0 flex-1 overflow-y-auto overscroll-contain print:h-auto print:overflow-visible">
-          <div className="mx-auto w-full max-w-5xl px-5 py-8 md:px-11">
+          {/* relative keeps unanchored absolute descendants (e.g. sr-only
+              boxes) inside the scroll content instead of the fixed shell,
+              where their overflow makes focus scroll-jump the whole app. */}
+          <div className="relative mx-auto w-full max-w-5xl px-5 py-8 md:px-11">
             {children}
           </div>
         </main>

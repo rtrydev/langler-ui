@@ -15,7 +15,7 @@ export function ChoiceChip({
   ...props
 }: ChoiceChipProps) {
   return (
-    <label className={cn("cursor-pointer touch-manipulation", className)}>
+    <label className={cn("relative cursor-pointer touch-manipulation", className)}>
       <input type={type} className="peer sr-only" {...props} />
       <span
         className={cn(
