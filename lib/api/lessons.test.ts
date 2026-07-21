@@ -3,6 +3,7 @@ import {
   deleteLesson,
   generateLessonPrompt,
   importLesson,
+  listLessonCompletions,
   listLessons,
   saveLessonResult,
 } from "@/lib/api/lessons";
@@ -250,5 +251,66 @@ describe("listLessonTopics", () => {
       expect(result.error.kind).toBe("response");
       expect(result.error.message).toBe("boom");
     }
+  });
+});
+
+describe("listLessonCompletions", () => {
+  it("fetches the completion history with the Cognito token", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    const items = [
+      {
+        attemptId: "a-2",
+        completedAt: "2026-07-19T09:30:00Z",
+        score: 7,
+        maxScore: 8,
+      },
+    ];
+    const request = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ items })));
+    vi.stubGlobal("fetch", request);
+
+    const result = await listLessonCompletions(session, "lesson-1");
+
+    expect(result).toEqual({ ok: true, data: items });
+    expect(request).toHaveBeenCalledWith(
+      "https://api.example.com/lessons/lesson-1/results",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer access-token",
+        }),
+      }),
+    );
+  });
+
+  it("returns a response error on failure", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    const request = vi
+      .fn()
+      .mockResolvedValue(
+        new Response(JSON.stringify({ error: "lesson not found" }), {
+          status: 404,
+        }),
+      );
+    vi.stubGlobal("fetch", request);
+
+    const result = await listLessonCompletions(session, "lesson-1");
+
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "response", message: "lesson not found", status: 404 },
+    });
+  });
+
+  it("maps a network failure to a typed error", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_URL", "https://api.example.com");
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+
+    const result = await listLessonCompletions(session, "lesson-1");
+
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "network", message: "The Langler API is unavailable." },
+    });
   });
 });

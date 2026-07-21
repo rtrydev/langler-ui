@@ -60,6 +60,13 @@ export type ImportResult =
   | { ok: true; data: ImportedLesson }
   | { ok: false; error: LessonApiError; issues?: LessonIssue[] };
 
+export type LessonCompletionSummary = {
+  count: number;
+  lastCompletedAt: string;
+  lastScore: number;
+  lastMaxScore: number;
+};
+
 export type LessonSummary = {
   lessonId: string;
   language: string;
@@ -76,6 +83,7 @@ export type LessonSummary = {
   totalPoints: number;
   hasStory: boolean;
   createdAt: string;
+  completion?: LessonCompletionSummary;
 };
 
 export type ClozeBlank = {
@@ -180,6 +188,17 @@ export type LessonResultDocument = {
 };
 
 export type SavedLessonResult = { attemptId: string; lessonId: string };
+
+export type LessonCompletion = {
+  attemptId: string;
+  completedAt: string;
+  score: number;
+  maxScore: number;
+};
+
+export type CompletionsResult =
+  | { ok: true; data: LessonCompletion[] }
+  | { ok: false; error: LessonApiError };
 
 export type SaveResult =
   | { ok: true; data: SavedLessonResult }
@@ -357,6 +376,28 @@ export async function deleteLesson(
       return { ok: false, error: (await responseError(response)).error };
     }
     return { ok: true };
+  } catch {
+    return { ok: false, error: unavailable };
+  }
+}
+
+export async function listLessonCompletions(
+  session: AuthSession,
+  lessonId: string,
+): Promise<CompletionsResult> {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  if (!apiUrl) {
+    return { ok: false, error: missingConfig };
+  }
+  try {
+    const response = await authorizedFetch(session,
+      `${apiUrl}/lessons/${encodeURIComponent(lessonId)}/results`,
+    );
+    if (!response.ok) {
+      return { ok: false, error: (await responseError(response)).error };
+    }
+    const data = (await response.json()) as { items: LessonCompletion[] };
+    return { ok: true, data: data.items };
   } catch {
     return { ok: false, error: unavailable };
   }
