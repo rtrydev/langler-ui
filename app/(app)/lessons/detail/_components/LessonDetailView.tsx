@@ -16,6 +16,8 @@ import { cn } from "@/lib/cn";
 import {
   deleteLesson,
   getLesson,
+  listLessonCompletions,
+  type LessonCompletion,
   type LessonDetail,
   type LessonExercise,
 } from "@/lib/api/lessons";
@@ -29,6 +31,26 @@ type DetailState =
   | { kind: "loading" }
   | { kind: "error"; message: string }
   | { kind: "ready"; lesson: LessonDetail };
+
+function completionDate(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "";
+  }
+  return new Intl.DateTimeFormat(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(parsed);
+}
+
+function scoreTone(percent: number): "success" | "warning" | "crimson" {
+  if (percent >= 80) return "success";
+  if (percent >= 50) return "warning";
+  return "crimson";
+}
 
 function exerciseSubtitle(exercise: LessonExercise): string {
   const payload = exercise.payload;
@@ -62,6 +84,7 @@ export function LessonDetailView() {
   const router = useRouter();
   const lessonId = useSearchParams().get("id") ?? "";
   const [state, setState] = useState<DetailState>({ kind: "loading" });
+  const [completions, setCompletions] = useState<LessonCompletion[]>([]);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
 
@@ -77,6 +100,12 @@ export function LessonDetailView() {
           ? { kind: "ready", lesson: result.data }
           : { kind: "error", message: result.error.message },
       );
+    });
+    listLessonCompletions(session, lessonId).then((result) => {
+      if (!active) return;
+      if (result.ok) {
+        setCompletions(result.data);
+      }
     });
     return () => {
       active = false;
@@ -235,6 +264,38 @@ export function LessonDetailView() {
                 : "Connected reading begins in a later lesson."}
             </p>
           </div>
+
+          {completions.length > 0 ? (
+            <div>
+              <Overline as="h2" className="mb-3">
+                Completions
+              </Overline>
+              <Card className="overflow-hidden" elevation="card" padding="none">
+                <ol>
+                  {completions.map((completion) => {
+                    const percent =
+                      completion.maxScore > 0
+                        ? Math.round((completion.score / completion.maxScore) * 100)
+                        : 0;
+                    return (
+                      <li
+                        className="flex items-center gap-4 px-5 py-3.5 not-last:border-b not-last:border-b-line"
+                        key={completion.attemptId}
+                      >
+                        <span className="min-w-0 flex-1 text-sm text-ink">
+                          {completionDate(completion.completedAt)}
+                        </span>
+                        <span className="font-mono text-xs text-ink-2">
+                          {completion.score}/{completion.maxScore}
+                        </span>
+                        <Badge tone={scoreTone(percent)}>{percent}%</Badge>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </Card>
+            </div>
+          ) : null}
         </div>
 
         <div className="lg:sticky lg:top-6">

@@ -171,7 +171,7 @@ export function GlossaryView() {
       >
         <SearchInput
           aria-label="Search words"
-          className="min-w-44"
+          className="min-w-44 flex-1"
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search words…"
           value={search}

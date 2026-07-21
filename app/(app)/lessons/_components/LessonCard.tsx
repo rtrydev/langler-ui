@@ -13,6 +13,16 @@ export function LessonCard({ lesson }: { lesson: LessonSummary }) {
   const importedLabel = Number.isNaN(imported.getTime())
     ? ""
     : imported.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const completion = lesson.completion;
+  const completed = completion ? new Date(completion.lastCompletedAt) : null;
+  const completedLabel =
+    completed && !Number.isNaN(completed.getTime())
+      ? completed.toLocaleDateString(undefined, { month: "short", day: "numeric" })
+      : "";
+  const completedPercent =
+    completion && completion.lastMaxScore > 0
+      ? Math.round((completion.lastScore / completion.lastMaxScore) * 100)
+      : null;
 
   return (
     <Link className="group" href={`/lessons/detail/?id=${lesson.lessonId}`}>
@@ -21,9 +31,17 @@ export function LessonCard({ lesson }: { lesson: LessonSummary }) {
         elevation="card"
       >
         <div className="mb-2.5 flex items-start justify-between gap-3">
-          <Badge tone={language?.tone ?? "neutral"}>
-            {language?.nativeName ?? lesson.language} · {lesson.level}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Badge tone={language?.tone ?? "neutral"}>
+              {language?.nativeName ?? lesson.language} · {lesson.level}
+            </Badge>
+            {completion ? (
+              <Badge tone="success">
+                ✓ {completedPercent !== null ? `${completedPercent}%` : "Done"}
+                {completedLabel ? ` · ${completedLabel}` : ""}
+              </Badge>
+            ) : null}
+          </div>
           <span className="font-mono text-[11px] text-ink-3">
             {lesson.sourceModel ? `✷ ${lesson.sourceModel}` : "Imported"}
             {importedLabel ? ` · ${importedLabel}` : ""}

@@ -27,6 +27,7 @@ export function LessonLibrary() {
   const [levelFilter, setLevelFilter] = useState("");
   const [topicFilter, setTopicFilter] = useState("");
   const [tagFilter, setTagFilter] = useState("");
+  const [completionFilter, setCompletionFilter] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -98,7 +99,9 @@ export function LessonLibrary() {
     return (!languageFilter || lesson.language === languageFilter) &&
       (!levelFilter || lesson.level === levelFilter) &&
       (!topicFilter || lesson.topic === topicFilter) &&
-      (!tagQuery || lesson.tags?.some((tag) => tag.toLocaleLowerCase().includes(tagQuery)));
+      (!tagQuery || lesson.tags?.some((tag) => tag.toLocaleLowerCase().includes(tagQuery))) &&
+      (!completionFilter ||
+        (completionFilter === "completed" ? Boolean(lesson.completion) : !lesson.completion));
   });
   const presentLanguages = LANGUAGES.filter((language) =>
     state.lessons.some((lesson) => lesson.language === language.code),
@@ -125,7 +128,8 @@ export function LessonLibrary() {
       >
         <Select aria-label="Filter by level" onChange={(event) => setLevelFilter(event.target.value)} value={levelFilter}><option value="">All levels</option>{levels.map((level) => <option key={level} value={level}>{level}</option>)}</Select>
         <Select aria-label="Filter by topic" onChange={(event) => setTopicFilter(event.target.value)} value={topicFilter}><option value="">All topics</option>{topics.map((topic) => <option key={topic} value={topic}>{topic}</option>)}</Select>
-        <SearchInput aria-label="Filter by tag" className="min-w-44" onChange={(event) => setTagFilter(event.target.value)} placeholder="Search tags…" value={tagFilter} />
+        <Select aria-label="Filter by completion" onChange={(event) => setCompletionFilter(event.target.value)} value={completionFilter}><option value="">Done &amp; not done</option><option value="completed">Completed</option><option value="not-completed">Not completed</option></Select>
+        <SearchInput aria-label="Filter by tag" className="min-w-44 flex-1" onChange={(event) => setTagFilter(event.target.value)} placeholder="Search tags…" value={tagFilter} />
       </FilterBar>
       <div className="grid gap-4 sm:grid-cols-2">
         {filtered.map((lesson) => (

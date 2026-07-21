@@ -27,14 +27,9 @@ export function FilterBar({
 }: FilterBarProps) {
   const showLanguages = languages.length > 1;
   return (
-    <div
-      className={cn(
-        "mb-6 flex flex-wrap items-center gap-2 border-b border-line pb-4",
-        className,
-      )}
-    >
+    <div className={cn("mb-6 grid gap-3 border-b border-line pb-4", className)}>
       {showLanguages && (
-        <>
+        <div className="flex flex-wrap items-center gap-2">
           <Pill
             onClick={() => onLanguageChange?.("")}
             selected={activeLanguage === ""}
@@ -51,12 +46,10 @@ export function FilterBar({
               {language.label}
             </Pill>
           ))}
-        </>
+        </div>
       )}
       {children && (
-        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
-          {children}
-        </div>
+        <div className="flex flex-wrap items-center gap-2">{children}</div>
       )}
     </div>
   );
