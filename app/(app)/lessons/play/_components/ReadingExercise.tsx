@@ -40,8 +40,8 @@ export function ReadingExercise({
   }, [language, level, session]);
 
   return (
-    <div className="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_22rem]">
-      <article className="border-line lg:max-h-[62vh] lg:overflow-y-auto lg:border-r lg:pr-9">
+    <div className="grid min-h-0 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,23rem)] lg:gap-9">
+      <article className="lg:max-h-[64vh] lg:overflow-y-auto lg:pr-3">
         <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
           <div>
             <Overline className="!text-accent">{exercise.payload?.genre === "short_story" ? "Short story" : "Reading"}</Overline>
@@ -59,7 +59,7 @@ export function ReadingExercise({
         {language === "ja" ? <p className="mt-5 text-xs italic text-ink-3">Tap a dotted word for its reference definition.</p> : null}
         <Glossary annotations={exercise.payload?.annotations} language={language} />
       </article>
-      <section aria-label="Comprehension questions" className="mt-7 border-t border-line pt-7 lg:mt-0 lg:max-h-[62vh] lg:overflow-y-auto lg:border-t-0 lg:bg-surface-2 lg:px-7 lg:pt-0">
+      <section aria-label="Comprehension questions" className="mt-7 border-t border-line pt-7 lg:mt-0 lg:max-h-[64vh] lg:overflow-y-auto lg:rounded-xl lg:border-t-0 lg:bg-surface-2 lg:p-6">
         <div className="grid gap-7">
           {questions.map((question, questionIndex) => {
             const answers = questionAnswers(question);
