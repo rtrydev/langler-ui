@@ -47,16 +47,20 @@ export function checkPastedLesson(raw: string): PasteCheck {
   try {
     parsed = JSON.parse(trimmed);
   } catch (cause) {
-    const detail = cause instanceof Error ? cause.message : "unknown error";
-    return {
-      ok: false,
-      issues: [
-        {
-          path: "$",
-          message: `This is not valid JSON (${detail}). Ask your AI to return only the JSON object.`,
-        },
-      ],
-    };
+    try {
+      parsed = JSON.parse(repairTypographicJson(trimmed));
+    } catch {
+      const detail = cause instanceof Error ? cause.message : "unknown error";
+      return {
+        ok: false,
+        issues: [
+          {
+            path: "$",
+            message: `This is not valid JSON (${detail}). Ask your AI to return only the JSON object.`,
+          },
+        ],
+      };
+    }
   }
 
   const result = lessonDocumentSchema.safeParse(parsed);
@@ -75,4 +79,60 @@ export function checkPastedLesson(raw: string): PasteCheck {
 function stripCodeFences(raw: string): string {
   const fenced = raw.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
   return fenced ? fenced[1] : raw;
+}
+
+// Some AI apps (notably the ChatGPT mobile app) render JSON with typographic
+// quotes and non-breaking spaces that JSON.parse rejects, including unescaped
+// curly quotes nested inside string values (story dialogue). Only tried after
+// a straight parse fails, so well-formed JSON is never rewritten. A quote is
+// treated as a string delimiter only where JSON structure allows one: any
+// quote opens a string outside one, and a quote inside a string closes it
+// only when the next non-whitespace character is ':', ',', '}', ']', or the
+// end of input. All other typographic quotes remain string content, which
+// JSON.parse accepts.
+const typographicQuotes = new Set(['"', "\u201c", "\u201d", "\u201e", "\u201f", "\u2033"]);
+
+function repairTypographicJson(raw: string): string {
+  let out = "";
+  let inString = false;
+  for (let i = 0; i < raw.length; i++) {
+    const char = raw[i];
+    if (!inString) {
+      if (typographicQuotes.has(char)) {
+        inString = true;
+        out += '"';
+      } else {
+        out += char === "\u00a0" ? " " : char;
+      }
+      continue;
+    }
+    if (char === "\\") {
+      const next = raw[i + 1] ?? "";
+      out += typographicQuotes.has(next) ? '\\"' : char + next;
+      i++;
+      continue;
+    }
+    if (typographicQuotes.has(char)) {
+      if (closesString(raw, i + 1)) {
+        inString = false;
+        out += '"';
+      } else {
+        out += char === '"' ? '\\"' : char;
+      }
+      continue;
+    }
+    out += char;
+  }
+  return out;
+}
+
+function closesString(raw: string, from: number): boolean {
+  for (let i = from; i < raw.length; i++) {
+    const char = raw[i];
+    if (char === " " || char === "\t" || char === "\n" || char === "\r" || char === "\u00a0") {
+      continue;
+    }
+    return char === ":" || char === "," || char === "}" || char === "]";
+  }
+  return true;
 }

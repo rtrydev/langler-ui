@@ -16,14 +16,14 @@ export function ValidationReport({ issues }: { issues: LessonIssue[] }) {
         Validation failed — {issues.length}{" "}
         {issues.length === 1 ? "issue" : "issues"}
       </p>
-      <ul className="mt-3 grid gap-2 font-mono text-xs leading-relaxed">
+      <ul className="mt-3 grid gap-2 break-words font-mono text-xs leading-relaxed">
         {issues.map((issue, index) => (
           <li
-            className="border-l-[3px] border-l-vermilion pl-3"
+            className="min-w-0 border-l-[3px] border-l-vermilion pl-3"
             key={`${issue.path}-${index}`}
           >
             <span className="font-bold tracking-wide text-vermilion">ERROR</span>{" "}
-            <span className="text-ink-3">{issue.path}</span>
+            <span className="break-all text-ink-3">{issue.path}</span>
             <span className="mt-1 block text-ink-2">{issue.message}</span>
           </li>
         ))}
