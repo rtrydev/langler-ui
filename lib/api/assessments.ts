@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 import {
   assessmentAnswersSchema,
@@ -119,10 +121,9 @@ export async function startAssessment(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/assessments`, {
+    const response = await authorizedFetch(session, `${apiUrl}/assessments`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(parsed.data),
@@ -153,12 +154,11 @@ export async function submitAssessmentAnswers(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/assessments/${encodeURIComponent(assessmentId)}/answers`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(parsed.data),
@@ -182,9 +182,8 @@ export async function getAssessment(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/assessments/${encodeURIComponent(assessmentId)}`,
-      { headers: { Authorization: `Bearer ${session.accessToken}` } },
     );
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
@@ -203,9 +202,7 @@ export async function listAssessments(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/assessments`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/assessments`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }
@@ -227,9 +224,7 @@ export async function getProfileLevels(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/profile/levels`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/profile/levels`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }

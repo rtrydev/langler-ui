@@ -186,37 +186,62 @@ export async function confirmPasswordReset(
   });
 }
 
+export function currentAccessToken(): string | null {
+  return currentSession?.accessToken ?? null;
+}
+
+let refreshInFlight: Promise<AuthSession | null> | null = null;
+
+// Exchanges the refresh token for fresh access/id tokens. Concurrent callers
+// share one in-flight exchange so a burst of 401s triggers a single renewal.
+export function refreshSession(): Promise<AuthSession | null> {
+  refreshInFlight ??= (async () => {
+    try {
+      const session = currentSession ?? readSessionCookies();
+      if (!session?.refreshToken) {
+        return null;
+      }
+      const { clientId } = configuration();
+      const payload = await cognitoRequest("GetTokensFromRefreshToken", {
+        ClientId: clientId,
+        RefreshToken: session.refreshToken,
+      });
+      const refreshed = authSession(
+        payload.AuthenticationResult,
+        session.refreshToken,
+      );
+      saveSession(refreshed);
+      return refreshed;
+    } catch {
+      return null;
+    } finally {
+      refreshInFlight = null;
+    }
+  })();
+  return refreshInFlight;
+}
+
 export async function restoreSession() {
   const session = currentSession ?? readSessionCookies();
   if (!session) {
     return null;
   }
 
-  try {
-    if (!tokenExpiresSoon(session.accessToken)) {
-      currentSession = session;
-      return session;
-    }
-    if (!session.refreshToken) {
-      clearSession();
-      return null;
-    }
-
-    const { clientId } = configuration();
-    const payload = await cognitoRequest("GetTokensFromRefreshToken", {
-      ClientId: clientId,
-      RefreshToken: session.refreshToken,
-    });
-    const refreshed = authSession(
-      payload.AuthenticationResult,
-      session.refreshToken,
-    );
-    saveSession(refreshed);
-    return refreshed;
-  } catch {
+  if (!tokenExpiresSoon(session.accessToken)) {
+    currentSession = session;
+    return session;
+  }
+  if (!session.refreshToken) {
     clearSession();
     return null;
   }
+
+  const refreshed = await refreshSession();
+  if (!refreshed) {
+    clearSession();
+    return null;
+  }
+  return refreshed;
 }
 
 export function clearSession() {

@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 import {
   agentTokenInputSchema,
@@ -60,9 +62,7 @@ export async function listAgentTokens(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/agent-tokens`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/agent-tokens`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }
@@ -98,10 +98,9 @@ export async function createAgentToken(
     Date.now() + parsed.data.expiryDays * 24 * 60 * 60 * 1000,
   ).toISOString();
   try {
-    const response = await fetch(`${apiUrl}/agent-tokens`, {
+    const response = await authorizedFetch(session, `${apiUrl}/agent-tokens`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -134,12 +133,9 @@ export async function revokeAgentToken(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/agent-tokens/${encodeURIComponent(id)}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${session.accessToken}` },
-      },
+    { method: "DELETE" },
     );
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };

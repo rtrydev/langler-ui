@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 
 export type VocabEntry = {
@@ -51,9 +53,7 @@ async function referencePage<T>(
     return { ok: false, message: "Langler API is not configured." };
   }
   try {
-    const response = await fetch(`${apiUrl}${path}?${params.toString()}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}${path}?${params.toString()}`);
     if (!response.ok) {
       return { ok: false, message: `Reference data returned ${response.status}.` };
     }
