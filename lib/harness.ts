@@ -32,6 +32,7 @@ Use Langler's reference API before writing a lesson. The API base URL is ${machi
 ## Quality bar
 
 - Match vocabulary, grammar, passage length, and question difficulty to the requested level.
+- Below JLPT N3 / CEFR B1, write every exercise \`prompt\`, cloze \`hint\`, and writing \`guidance\` in English — the learner cannot yet read instructions in the target language; only the material being practiced is in the target language. From N3 / B1 up, write instructions in the target language, phrased simply for the level.
 - Prefer exercises the app can grade automatically: multiple_choice, matching, ordering, and cloze with a \`wordBank\`. Give comprehension questions \`kind: multiple_choice\`; reserve short_answer for questions that cannot be closed-form and list accepted phrasings in \`alternates\`. Translation and writing prompts are self-assessed, so use them sparingly.
 - Ground the story in the selected topic and retrieved targets; use those targets naturally rather than listing them.
 - Include at least two comprehension questions for connected lessons when the learner can reasonably answer them.
@@ -181,7 +182,9 @@ components:
       properties:
         exerciseId: { type: string, minLength: 1 }
         type: { type: string, enum: [cloze, translation, ordering, matching, multiple_choice, reading, writing_prompt, script_practice] }
-        prompt: { type: string }
+        prompt:
+          type: string
+          description: Learner-facing instruction. English below JLPT N3 / CEFR B1; target language from N3 / B1 up.
         points: { type: integer, minimum: 0 }
         referencedVocab: { type: array, items: { type: string } }
         referencedGrammar: { type: array, items: { type: string } }
