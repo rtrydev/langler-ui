@@ -291,6 +291,10 @@ ruby rt {
   color: #161412;
   box-shadow: var(--shadow-window);
   font-family: var(--font-serif);
+  /* Last-resort wrap for runs with no break opportunity (long spaceless
+     Burmese phrases on iOS): keeps content inside the sheet on screen and
+     inside the 184mm page in print. */
+  overflow-wrap: break-word;
 }
 
 .worksheet-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 2rem; border-bottom: 2px solid #161412; padding-bottom: .75rem; }
@@ -308,14 +312,16 @@ ruby rt {
 .worksheet-tokens { display: flex; flex-wrap: wrap; gap: .45rem; font-family: var(--font-noto-sans-jp), sans-serif; }
 .worksheet-tokens span { padding: .35rem .55rem; border: 1px solid #777; border-radius: 4px; }
 .worksheet-matching { display: grid; gap: .45rem; }
-.worksheet-matching p { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; border-bottom: 1px dotted #bbb; font-family: var(--font-noto-sans-jp), sans-serif; }
+.worksheet-matching p { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4rem; border-bottom: 1px dotted #bbb; font-family: var(--font-noto-sans-jp), sans-serif; }
 .worksheet-passage { padding: 1rem 1.25rem; border: 1px solid #999; }
 .worksheet-passage h3 { margin-bottom: .6rem; font-size: 1.15rem; font-weight: 650; }
 .worksheet-passage p { margin-bottom: .75em; orphans: 3; widows: 3; }
 .worksheet-glossary { margin-top: .9rem; padding: .75rem 1.25rem; border: 1px solid #999; break-inside: avoid; }
 .worksheet-glossary h3 { margin-bottom: .5rem; font-family: var(--font-sans); font-size: .74rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #555; }
-.worksheet-glossary dl { display: grid; grid-template-columns: 1fr 1fr; gap: .3rem 2rem; font-family: var(--font-noto-serif-jp), serif; font-size: .95rem; }
-.worksheet-glossary dl > div { display: flex; align-items: baseline; gap: .4rem; break-inside: avoid; }
+/* minmax(0,1fr) + flex-wrap: tracks may shrink below the row's min-content and
+   long glosses wrap onto the next line instead of overflowing the sheet. */
+.worksheet-glossary dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .3rem 2rem; font-family: var(--font-noto-serif-jp), serif; font-size: .95rem; }
+.worksheet-glossary dl > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .4rem; break-inside: avoid; }
 .worksheet-glossary dt { font-weight: 600; }
 .worksheet-glossary dd { color: #333; }
 .worksheet-glossary-reading { font-family: var(--font-sans); font-size: .72rem; color: #666; }
@@ -356,10 +362,16 @@ ruby rt {
 @media print {
   :root { color-scheme: light; --paper: #fff; --surface: #fff; --ink: #161412; }
   html, body { height: auto; overflow: visible; }
+  /* Pin the print layout in physical units so phones and desktops produce the
+     same output at 100% scale: the page fills the A4 printable width (210mm
+     minus the 13mm @page margins) instead of inheriting a device-dependent
+     screen layout width. */
+  html { font-size: 12.75pt; }
   body { background: #fff; }
   nav, header:has(+ main), .print-toolbar { display: none !important; }
   main:has(.print-workspace) { max-width: none !important; padding: 0 !important; }
-  .worksheet-page { width: auto; min-height: 0; margin: 0; padding: 0; border: 0; box-shadow: none; }
+  main:has(.print-workspace) > div { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+  .worksheet-page { width: 184mm; min-height: 0; margin: 0 auto; padding: 0; border: 0; box-shadow: none; }
   .worksheet-keep, .worksheet-glyph-group { break-inside: avoid; }
   .worksheet-passage { break-inside: auto; }
   .worksheet-story h2, .worksheet-story h3 { break-after: avoid; }
@@ -367,7 +379,21 @@ ruby rt {
   .worksheet-page footer { break-inside: avoid; }
 }
 
-@media (max-width: 640px) {
+/* iOS WebKit applies print styles to the live page around the print flow (and
+   in standalone web apps), which made the fixed 184mm print width spill past
+   phone viewports. These screen-scoped declarations sit after the print block
+   so they win the cascade whenever the page is actually on screen; in a real
+   print context (screen unmatched) they are inert and the pinned A4 layout
+   above still applies. */
+@media screen {
+  html { font-size: 100%; }
+  .print-toolbar { display: flex !important; }
+  .worksheet-page { width: min(100%, 52rem); min-height: 70rem; margin: 0 auto 2rem; padding: 3.25rem 3.5rem; border: 1px solid var(--line); box-shadow: var(--shadow-window); }
+}
+
+/* Screen-only: on a phone this must never leak into print output, where the
+   layout is pinned to physical A4 units above. */
+@media screen and (max-width: 640px) {
   .worksheet-page { padding: 2rem 1.25rem; }
   .worksheet-header { align-items: flex-start; flex-direction: column; gap: .5rem; }
 }

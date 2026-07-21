@@ -1,11 +1,22 @@
 import type { LessonExercise, ScriptPracticeItem } from "@/lib/api/lessons";
 import { kanjiVGReference, strokeAssetUrl } from "@/lib/api/reference";
 import { glossaryEntries } from "@/lib/glossary";
-import { EXERCISE_TYPES, exerciseTypeLabel } from "@/lib/lesson-catalog";
+import { EXERCISE_TYPES } from "@/lib/lesson-catalog";
 import { seededShuffle } from "@/lib/lesson-grading";
 import { ClozePrint } from "./ClozePrint";
 
 const KNOWN_EXERCISE_TYPES: Set<string> = new Set(EXERCISE_TYPES.map((type) => type.code));
+
+const FALLBACK_INSTRUCTIONS: Record<string, string> = {
+  cloze: "Fill in each blank.",
+  translation: "Translate the sentence.",
+  ordering: "Arrange the parts into the correct order.",
+  matching: "Match each item with its meaning.",
+  multiple_choice: "Choose the correct answer.",
+  reading: "Read the passage and answer the questions.",
+  writing_prompt: "Respond to the writing prompt.",
+  script_practice: "Practice the items below.",
+};
 
 export function WorksheetExercise({ exercise, index, answers, language }: { exercise: LessonExercise; index: number; answers: boolean; language: string }) {
   const payload = exercise.payload;
@@ -13,10 +24,10 @@ export function WorksheetExercise({ exercise, index, answers, language }: { exer
     (item): item is ScriptPracticeItem => typeof item !== "string",
   );
   const orthography = practiceItems.some((item) => item.kind);
+  const instruction = exercise.prompt || FALLBACK_INSTRUCTIONS[exercise.type];
   return (
     <section className={`worksheet-exercise ${exercise.type === "reading" ? "worksheet-story" : "worksheet-keep"}`}>
-      <h2>{index + 1} · {exerciseTypeLabel(exercise.type)}</h2>
-      {exercise.prompt ? <p className="worksheet-instruction">{exercise.prompt}</p> : null}
+      <h2>{instruction ? `${index + 1}. ${instruction}` : `${index + 1}.`}</h2>
       {exercise.type === "cloze" ? <ClozePrint answers={answers} exercise={exercise} /> : null}
       {exercise.type === "translation" ? <><p className="worksheet-japanese">{payload?.source}</p>{answers ? <p>{payload?.reference || "Self-assessed response"}</p> : <div className="worksheet-lines" />}</> : null}
       {exercise.type === "ordering" ? <><div className="worksheet-tokens">{seededShuffle((payload?.items ?? []).filter((item): item is string => typeof item === "string"), exercise.exerciseId).map((item, itemIndex) => <span key={`${item}-${itemIndex}`}>{item}</span>)}</div>{answers ? <p className="worksheet-answer">{(payload?.items ?? []).filter((item): item is string => typeof item === "string").join(" ")}</p> : <div className="worksheet-line" />}</> : null}

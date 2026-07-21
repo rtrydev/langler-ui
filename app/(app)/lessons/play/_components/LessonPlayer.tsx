@@ -88,10 +88,11 @@ export function LessonPlayer() {
       badge={<Badge tone={language?.tone}>{language?.nativeName ?? state.lesson.language}</Badge>}
       progress={<StepProgress className="w-full" completed={index + 1} total={state.lesson.exercises.length} />}
       counter={`${index + 1} / ${state.lesson.exercises.length}`}
+      className={exercise.type === "reading" ? "lg:max-w-none" : undefined}
       bodyClassName="min-h-[28rem] sm:p-8 lg:p-10"
       footer={<p className="text-center text-xs text-ink-3">Your place and answers stay here while you work through this exercise.</p>}
     >
-      <Overline className="mb-2">{exerciseTypeLabel(exercise.type)}</Overline>
+      {exercise.type !== "reading" ? <Overline className="mb-2">{exerciseTypeLabel(exercise.type)}</Overline> : null}
       <ExerciseRenderer exercise={exercise} language={state.lesson.language} level={state.lesson.level} onComplete={complete} />
     </SessionChrome>
   );
