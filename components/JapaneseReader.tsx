@@ -50,7 +50,7 @@ export function JapaneseReader({
         ))}
       </div>
       {definition ? (
-        <Card className="sticky bottom-3 z-10 mt-5 shadow-raised" elevation="raised">
+        <Card className="sticky bottom-3 z-10 mt-5" elevation="glass">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="font-jp-serif text-3xl">{definition.surface}</p>

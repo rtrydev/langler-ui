@@ -1,15 +1,10 @@
 import { Suspense } from "react";
+import { LoadingState } from "@/components/LoadingState";
 import { LessonDetailView } from "./_components/LessonDetailView";
 
 export default function LessonDetailPage() {
   return (
-    <Suspense
-      fallback={
-        <p className="font-mono text-sm text-ink-2" role="status">
-          Opening the lesson…
-        </p>
-      }
-    >
+    <Suspense fallback={<LoadingState>Opening the lesson…</LoadingState>}>
       <LessonDetailView />
     </Suspense>
   );

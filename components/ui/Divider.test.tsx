@@ -7,6 +7,6 @@ describe("Divider", () => {
     render(<Divider />);
     const el = screen.getByRole("separator");
     expect(el.tagName).toBe("HR");
-    expect(el.className).toContain("bg-line-2");
+    expect(el.className).toContain("bg-line");
   });
 });

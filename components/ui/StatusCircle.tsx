@@ -11,11 +11,11 @@ export type StatusCircleTone =
 export type StatusCircleSize = "sm" | "md" | "lg";
 
 const toneClasses: Record<StatusCircleTone, string> = {
-  accent: "bg-accent-soft text-accent",
-  success: "bg-success-soft text-success",
-  warning: "bg-warning-soft text-warning",
-  error: "bg-vermilion-soft text-vermilion",
-  neutral: "bg-tint text-ink-2",
+  accent: "border-accent-border bg-accent-soft text-accent",
+  success: "border-success-border bg-success-soft text-success",
+  warning: "border-warning-border bg-warning-soft text-warning",
+  error: "border-vermilion-border bg-vermilion-soft text-vermilion",
+  neutral: "border-line bg-tint text-ink-2",
 };
 
 const sizeClasses: Record<StatusCircleSize, string> = {
@@ -38,7 +38,7 @@ export function StatusCircle({
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center justify-center rounded-full",
+        "inline-flex shrink-0 items-center justify-center rounded-full border",
         toneClasses[tone],
         sizeClasses[size],
         className,

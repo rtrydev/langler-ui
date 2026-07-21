@@ -34,27 +34,27 @@ export function TokenList({
     );
   }
   return (
-    <ul className="divide-y divide-line-2">
+    <ul className="divide-y divide-line">
       {tokens.map((token) => (
         <li
-          className="grid gap-3 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_9rem_5rem_auto] sm:items-center"
+          className="grid gap-x-3 gap-y-2 px-5 py-4 sm:grid-cols-[minmax(0,1fr)_9rem_5rem_auto] sm:items-start"
           key={token.id}
         >
           <div className="min-w-0">
-            <p className="truncate text-[13.5px] font-semibold text-ink">
+            <p className="truncate text-sm font-semibold text-ink">
               {token.label}
-              <span className="ml-2 font-mono text-[11px] font-normal text-ink-3">
+              <span className="ml-2 font-mono text-xs font-normal text-ink-3">
                 ••••{token.suffix}
               </span>
             </p>
             <div className="mt-1.5 flex flex-wrap gap-1.5">
               {token.scopes.map((scope) => (
-                <Badge key={scope}>{scope.replace("-", " ")}</Badge>
+                <Badge key={scope} tone="accent">{scope.replace("-", " ")}</Badge>
               ))}
             </div>
           </div>
-          <div className="text-xs text-ink-2">
-            <span className="mr-1 text-ink-3 sm:hidden">Last used:</span>
+          <div className="font-mono text-xs text-ink-2">
+            <span className="mr-1 font-sans text-ink-3 sm:hidden">Last used:</span>
             {token.lastUsed ? dateFormat.format(new Date(token.lastUsed)) : "Never"}
           </div>
           <div>
@@ -62,7 +62,7 @@ export function TokenList({
               {token.status[0].toUpperCase() + token.status.slice(1)}
             </Badge>
           </div>
-          <div className="sm:text-right">
+          <div className="flex min-h-8 items-center sm:justify-end">
             {token.status === "active" ? (
               <Button
                 disabled={revoking === token.id}
@@ -73,7 +73,7 @@ export function TokenList({
                 {revoking === token.id ? "Revoking…" : "Revoke"}
               </Button>
             ) : (
-              <span className="text-xs text-ink-3">Expires {dateFormat.format(new Date(token.expiresAt))}</span>
+              <span className="font-mono text-xs text-ink-3">Expires {dateFormat.format(new Date(token.expiresAt))}</span>
             )}
           </div>
         </li>

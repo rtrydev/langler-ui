@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Callout } from "@/components/ui/Callout";
+import { Overline } from "@/components/ui/Overline";
 import { Textarea } from "@/components/ui/Textarea";
 import { selfOutcome } from "@/lib/lesson-grading";
 import { SelfAssessment } from "./SelfAssessment";
@@ -27,15 +28,15 @@ export function WritingExercise({ exercise, onComplete }: ExercisePlayerProps) {
       {exercise.payload?.guidance ? <Callout className="mt-4" tone="info">{exercise.payload.guidance}</Callout> : null}
       <Textarea className="mt-5 min-h-64 font-jp text-base" onChange={(event) => setText(event.target.value)} placeholder="Write here…" value={text} />
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button disabled={!text.trim()} onClick={() => setRevealed(true)}>Review my writing</Button>
-        <Button disabled={!text.trim()} onClick={() => void copyFeedbackPrompt()} variant="secondary">{copied ? "Copied for your AI" : "Copy for AI feedback"}</Button>
+        <Button disabled={!text.trim()} onClick={() => setRevealed(true)} size="lg">Review my writing</Button>
+        <Button disabled={!text.trim()} onClick={() => void copyFeedbackPrompt()} size="lg" variant="secondary">{copied ? "Copied for your AI" : "Copy for AI feedback"}</Button>
       </div>
       {revealed ? (
         <>
-          <Card className="mt-5" elevation="flat">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-3">Self-assessment rubric</p>
+          <Card className="mt-5 bg-surface-2" elevation="flat">
+            <Overline>Self-assessment rubric</Overline>
             <p className="mt-2 text-sm leading-relaxed">Check that you answered the prompt, used the target structures, and can understand your response when reading it back.</p>
-            {exercise.payload?.modelAnswer ? <p className="mt-4 border-t border-line-2 pt-4 font-jp leading-relaxed"><span className="block font-sans text-[11px] font-bold uppercase tracking-wider text-ink-3">Model response</span>{exercise.payload.modelAnswer}</p> : null}
+            {exercise.payload?.modelAnswer ? <p className="mt-4 border-t border-line pt-4 font-jp leading-relaxed"><Overline as="span" className="block">Model response</Overline>{exercise.payload.modelAnswer}</p> : null}
           </Card>
           <SelfAssessment rating={rating} onChange={setRating} onContinue={() => rating !== null && onComplete(selfOutcome(exercise, rating))} />
         </>

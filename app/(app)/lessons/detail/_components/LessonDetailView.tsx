@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
 import { useSession } from "@/components/SessionContext";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
+import { Divider } from "@/components/ui/Divider";
 import { Heading } from "@/components/ui/Heading";
 import { Overline } from "@/components/ui/Overline";
+import { cn } from "@/lib/cn";
 import {
   deleteLesson,
   getLesson,
@@ -38,10 +41,16 @@ function exerciseSubtitle(exercise: LessonExercise): string {
         : "";
     case "ordering":
     case "script_practice":
+    case "polish_orthography":
       return payload?.items ? `${payload.items.length} items` : "";
+    case "multiple_choice":
+      return payload?.questions
+        ? `${payload.questions.length} ${payload.questions.length === 1 ? "question" : "questions"}`
+        : "";
     case "matching":
       return payload?.pairs ? `${payload.pairs.length} pairs` : "";
     case "translation":
+    case "writing":
       return "Self-assessed";
     default:
       return "";
@@ -103,11 +112,7 @@ export function LessonDetailView() {
   }
 
   if (state.kind === "loading") {
-    return (
-      <p className="font-mono text-sm text-ink-2" role="status">
-        Opening the lesson…
-      </p>
-    );
+    return <LoadingState>Opening the lesson…</LoadingState>;
   }
 
   if (state.kind === "error") {
@@ -130,126 +135,135 @@ export function LessonDetailView() {
     (exercise) =>
       exercise.type === "reading" && exercise.payload?.genre === "short_story",
   );
+  const totalPoints = lesson.exercises.reduce(
+    (total, exercise) => total + (exercise.points ?? 0),
+    0,
+  );
 
   return (
     <div>
-      <Link
-        className="mb-4 inline-block text-[12.5px] text-ink-3 hover:text-ink"
-        href="/lessons/"
-      >
-        ← Lessons
-      </Link>
-      <div className="mb-3 flex flex-wrap items-center gap-2.5">
-        <Badge tone={language?.tone ?? "neutral"}>
-          {language?.nativeName ?? lesson.language} ·{" "}
-          {levelLabel(lesson.language, lesson.level)}
-        </Badge>
-        <span className="font-mono text-[11.5px] text-ink-3">
-          {lesson.sourceModel ? `✷ ${lesson.sourceModel} · ` : ""}imported{" "}
-          {Number.isNaN(imported.getTime())
-            ? ""
-            : imported.toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-        </span>
-      </div>
-      <Heading as="h1" size="lg">
-        {lesson.title}
-      </Heading>
-      {lesson.description ? (
-        <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-2">
-          {lesson.description}
-        </p>
-      ) : null}
-      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-3">
-        {lesson.topic ? <span>Topic · {lesson.topic}</span> : null}
-        {lesson.estimatedMinutes ? (
-          <span>~{lesson.estimatedMinutes} min</span>
-        ) : null}
-        <span>
-          {lesson.exercises.reduce(
-            (total, exercise) => total + (exercise.points ?? 0),
-            0,
-          )}{" "}
-          points
-        </span>
-      </div>
-
-      <Overline as="h2" className="mt-8 mb-3">
-        Exercises
-      </Overline>
-      <Card elevation="card" padding="none">
-        <ol>
-          {lesson.exercises.map((exercise, index) => {
-            const isStory = exercise === story;
-            const subtitle = exerciseSubtitle(exercise);
-            return (
-              <li
-                className={`flex items-center gap-3.5 px-4 py-3.5 not-last:border-b not-last:border-b-line-2 ${isStory ? "border-l-[3px] border-l-accent" : ""}`}
-                key={exercise.exerciseId}
-              >
-                <span className="w-4 text-xs font-semibold text-ink-3">
-                  {index + 1}
-                </span>
-                <div className="flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-sm font-semibold">
-                    {exerciseTypeLabel(exercise.type)}
-                    {isStory && exercise.payload?.title ? (
-                      <span className="font-jp text-ink-2">
-                        — {exercise.payload.title}
-                      </span>
-                    ) : null}
-                    {isStory ? <Badge tone="accent">STORY</Badge> : null}
-                  </p>
-                  {subtitle ? (
-                    <p className="mt-0.5 text-[11.5px] text-ink-3">
-                      {subtitle}
-                    </p>
-                  ) : null}
-                </div>
-                {exercise.points ? (
-                  <span className="text-xs font-semibold text-ink-2">
-                    {exercise.points} pts
-                  </span>
-                ) : null}
-              </li>
-            );
-          })}
-        </ol>
-      </Card>
-      <p className="mt-2.5 flex gap-2 text-[11.5px] leading-relaxed text-ink-3">
-        <span aria-hidden className="text-accent">
-          ◆
-        </span>
-        {story
-          ? "This lesson opens with a short story that introduces the new words in context."
-          : "Connected reading begins in a later lesson."}
-      </p>
-
-      <Card className="mt-6 grid gap-2 sm:max-w-xs" elevation="card">
-        <Link href={`/lessons/play/?id=${lesson.lessonId}`}>
-          <Button fullWidth size="lg">Start lesson</Button>
-        </Link>
-        <Link href={`/lessons/print/?id=${lesson.lessonId}`}>
-          <Button fullWidth variant="secondary">Print worksheet</Button>
-        </Link>
-        <p className="text-center text-[11px] leading-relaxed text-ink-3">Choose whether to include a separate answer key in the print view.</p>
-      </Card>
-
-      {deleteError ? (
-        <Callout className="mt-6" tone="error">
-          {deleteError}
-        </Callout>
-      ) : null}
-      <div className="mt-4">
-        <Button
-          disabled={deleting}
-          onClick={() => void removeLesson()}
-          variant="danger"
-        >
-          {deleting ? "Deleting…" : "Delete lesson"}
+      <Link href="/lessons/">
+        <Button size="sm" variant="ghost">
+          ← Lessons
         </Button>
+      </Link>
+      <div className="mt-4 grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start lg:gap-8">
+        <div className="grid gap-8">
+          <div>
+            <Badge tone={language?.tone ?? "neutral"}>
+              {language?.nativeName ?? lesson.language} ·{" "}
+              {levelLabel(lesson.language, lesson.level)}
+            </Badge>
+            <Heading as="h1" className="mt-3" size="lg">
+              {lesson.title}
+            </Heading>
+            {lesson.description ? (
+              <p className="mt-2 max-w-xl text-sm leading-relaxed text-ink-2">
+                {lesson.description}
+              </p>
+            ) : null}
+            <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11px] text-ink-3">
+              <span>
+                {lesson.sourceModel ? `✷ ${lesson.sourceModel} · ` : ""}imported{" "}
+                {Number.isNaN(imported.getTime())
+                  ? ""
+                  : imported.toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                    })}
+              </span>
+              {lesson.topic ? <span>Topic · {lesson.topic}</span> : null}
+              {lesson.estimatedMinutes ? (
+                <span>~{lesson.estimatedMinutes} min</span>
+              ) : null}
+              <span>{totalPoints} points</span>
+            </div>
+          </div>
+
+          <div>
+            <Overline as="h2" className="mb-3">
+              Exercises
+            </Overline>
+            <Card className="overflow-hidden" elevation="card" padding="none">
+              <ol>
+                {lesson.exercises.map((exercise, index) => {
+                  const isStory = exercise === story;
+                  const subtitle = exerciseSubtitle(exercise);
+                  return (
+                    <li
+                      className={cn(
+                        "flex items-center gap-4 px-5 py-4 not-last:border-b not-last:border-b-line",
+                        isStory && "bg-tint",
+                      )}
+                      key={exercise.exerciseId}
+                    >
+                      <span className="font-mono text-xs text-ink-3">
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
+                          {exerciseTypeLabel(exercise.type)}
+                          {isStory && exercise.payload?.title ? (
+                            <span className="font-jp text-ink-2">
+                              — {exercise.payload.title}
+                            </span>
+                          ) : null}
+                          {isStory ? <Badge tone="vermilion">STORY</Badge> : null}
+                        </p>
+                        {subtitle ? (
+                          <p className="mt-0.5 font-mono text-[11px] text-ink-3">
+                            {subtitle}
+                          </p>
+                        ) : null}
+                      </div>
+                      {exercise.points ? (
+                        <span className="font-mono text-xs font-semibold text-ink-2">
+                          {exercise.points} pts
+                        </span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ol>
+            </Card>
+            <p className="mt-3 flex gap-2 font-mono text-[11px] leading-relaxed text-ink-3">
+              <span aria-hidden className="text-vermilion">
+                ◆
+              </span>
+              {story
+                ? "This lesson opens with a short story that introduces the new words in context."
+                : "Connected reading begins in a later lesson."}
+            </p>
+          </div>
+        </div>
+
+        <div className="lg:sticky lg:top-6">
+          <Card className="grid gap-3" elevation="card">
+            <Link href={`/lessons/play/?id=${lesson.lessonId}`}>
+              <Button fullWidth size="lg">
+                Start lesson
+              </Button>
+            </Link>
+            <Link href={`/lessons/print/?id=${lesson.lessonId}`}>
+              <Button fullWidth variant="secondary">
+                Print worksheet
+              </Button>
+            </Link>
+            <p className="text-center font-mono text-[11px] leading-relaxed text-ink-3">
+              Choose whether to include a separate answer key in the print view.
+            </p>
+            <Divider className="my-1" />
+            {deleteError ? <Callout tone="error">{deleteError}</Callout> : null}
+            <Button
+              disabled={deleting}
+              fullWidth
+              onClick={() => void removeLesson()}
+              variant="danger"
+            >
+              {deleting ? "Deleting…" : "Delete lesson"}
+            </Button>
+          </Card>
+        </div>
       </div>
     </div>
   );

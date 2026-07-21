@@ -3,14 +3,19 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
+import { SessionChrome } from "@/components/SessionChrome";
 import { useSession } from "@/components/SessionContext";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Heading } from "@/components/ui/Heading";
 import { Kbd } from "@/components/ui/Kbd";
+import { Overline } from "@/components/ui/Overline";
 import { StatusCircle } from "@/components/ui/StatusCircle";
+import { cn } from "@/lib/cn";
 import {
   getDueReviews,
   gradeReview,
@@ -28,12 +33,32 @@ const GRADES: Array<{
   grade: ReviewGradeInput["grade"];
   label: string;
   key: string;
-  color: string;
+  tone: string;
 }> = [
-  { grade: "again", label: "Again", key: "1", color: "text-vermilion" },
-  { grade: "hard", label: "Hard", key: "2", color: "text-warning" },
-  { grade: "good", label: "Good", key: "3", color: "text-success" },
-  { grade: "easy", label: "Easy", key: "4", color: "text-accent" },
+  {
+    grade: "again",
+    label: "Again",
+    key: "1",
+    tone: "border-vermilion-border bg-vermilion-soft text-vermilion hover:bg-vermilion-soft",
+  },
+  {
+    grade: "hard",
+    label: "Hard",
+    key: "2",
+    tone: "border-warning-border bg-warning-soft text-warning-strong",
+  },
+  {
+    grade: "good",
+    label: "Good",
+    key: "3",
+    tone: "border-accent-border bg-accent-soft text-accent-strong",
+  },
+  {
+    grade: "easy",
+    label: "Easy",
+    key: "4",
+    tone: "border-success-border bg-success-soft text-success",
+  },
 ];
 
 function nextDueLabel(value: string): string {
@@ -119,11 +144,7 @@ export function ReviewSession() {
   }
 
   if (state.kind === "loading") {
-    return (
-      <p className="font-mono text-sm text-ink-2" role="status">
-        Preparing today&apos;s review…
-      </p>
-    );
+    return <LoadingState>Preparing today&apos;s review…</LoadingState>;
   }
 
   if (state.kind === "error") {
@@ -154,7 +175,7 @@ export function ReviewSession() {
 
   if (!item) {
     return (
-      <Card className="mx-auto max-w-md text-center" padding="lg">
+      <Card className="mx-auto max-w-md text-center" elevation="raised" padding="lg">
         <StatusCircle className="mx-auto mb-4" size="lg" tone="success">✓</StatusCircle>
         <Heading as="h1" size="sm">
           Session complete
@@ -162,46 +183,65 @@ export function ReviewSession() {
         <p className="mt-1.5 text-[13px] text-ink-2">
           {reviewed} items reviewed · {reviewed - relearn} remembered
         </p>
-        <div className="my-5 flex justify-center gap-8 border-y border-line-2 py-4">
-          <div>
-            <p className="text-xl font-bold">{relearn}</p>
-            <p className="text-[11px] text-ink-3">to relearn</p>
+        <div className="my-5 grid grid-cols-2 gap-3">
+          <div className="rounded-md border border-line bg-tint p-3">
+            <p className="font-display text-2xl font-semibold">{relearn}</p>
+            <p className="font-mono text-[10px] tracking-[0.12em] text-ink-3 uppercase">
+              to relearn
+            </p>
           </div>
-          <div>
-            <p className="text-xl font-bold">{nextDue ? nextDueLabel(nextDue) : "—"}</p>
-            <p className="text-[11px] text-ink-3">next due</p>
+          <div className="rounded-md border border-line bg-tint p-3">
+            <p className="font-display text-2xl font-semibold">
+              {nextDue ? nextDueLabel(nextDue) : "—"}
+            </p>
+            <p className="font-mono text-[10px] tracking-[0.12em] text-ink-3 uppercase">
+              next due
+            </p>
           </div>
         </div>
         <Link href="/">
-          <Button>Back to home</Button>
+          <Button fullWidth size="lg">Back to home</Button>
         </Link>
       </Card>
     );
   }
 
   return (
-    <Card className="mx-auto flex min-h-[31rem] max-w-[620px] flex-col overflow-hidden" padding="none">
-      <div className="flex h-[52px] items-center gap-4 border-b border-line px-5">
-        <Link
-          aria-label="Exit review"
-          className="text-xl text-ink-2 hover:text-ink"
-          href="/"
-        >
-          ×
-        </Link>
-        <span className="rounded-[5px] bg-accent-soft px-2 py-1 text-[11px] font-semibold text-accent">
-          {language?.nativeName ?? item.language}
-        </span>
-        <span className="ml-auto text-xs text-ink-3">
-          {state.items.length} left today
-        </span>
-      </div>
-
-      <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-        <p className="text-[11px] font-semibold tracking-wide text-ink-3 uppercase">
-          {item.kind === "grammar" ? "Grammar" : "Recall"}
-        </p>
-        <p className="mt-4 font-jp-serif text-5xl leading-tight text-ink sm:text-6xl">
+    <SessionChrome
+      exitHref="/"
+      exitLabel="Exit review"
+      badge={
+        <Badge tone={language?.tone}>{language?.nativeName ?? item.language}</Badge>
+      }
+      counter={`${state.items.length} left today`}
+      bodyClassName="items-center justify-center py-10 text-center"
+      footer={
+        revealed ? (
+          <div className="grid grid-cols-4 gap-2">
+            {GRADES.map((option) => (
+              <button
+                type="button"
+                className={cn(
+                  "flex touch-manipulation flex-col items-center gap-1.5 rounded-md border px-1 py-3 text-sm font-[540] transition-all duration-150 hover:-translate-y-px disabled:opacity-50",
+                  option.tone,
+                )}
+                disabled={submitting}
+                key={option.grade}
+                onClick={() => void submitGrade(option.grade)}
+              >
+                {option.label}
+                <Kbd>{option.key}</Kbd>
+              </button>
+            ))}
+          </div>
+        ) : undefined
+      }
+    >
+      <Overline className="mb-4 self-center">
+        {item.kind === "grammar" ? "Grammar" : "Recall"}
+      </Overline>
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <p className="font-jp-serif text-5xl leading-tight text-ink sm:text-6xl">
           {item.headword}
         </p>
         {!revealed ? (
@@ -209,14 +249,18 @@ export function ReviewSession() {
             <Button onClick={() => setRevealed(true)} size="lg">
               Reveal
             </Button>
-            <p className="mt-3 text-[11px] text-ink-3"><Kbd>Space</Kbd> to reveal</p>
+            <p className="mt-3 text-[11px] text-ink-3">
+              <Kbd>Space</Kbd> to reveal
+            </p>
           </div>
         ) : (
           <div className="mt-5">
-            {item.reading ? <p className="text-base text-ink-2">{item.reading}</p> : null}
+            {item.reading ? (
+              <p className="font-mono text-base text-ink-3">{item.reading}</p>
+            ) : null}
             <p className="mt-2 text-xl font-semibold text-ink">{item.gloss}</p>
             {item.example ? (
-              <div className="mt-5 text-base leading-relaxed text-ink-2">
+              <div className="mt-5 rounded-md border border-line bg-surface-2 px-4 py-3 text-base leading-relaxed text-ink-2">
                 <p>{item.example}</p>
                 {item.exampleMeaning ? (
                   <p className="mt-1 text-xs text-ink-3">{item.exampleMeaning}</p>
@@ -231,27 +275,6 @@ export function ReviewSession() {
           </Callout>
         ) : null}
       </div>
-
-      <div className="grid min-h-[61px] grid-cols-4 border-t border-line">
-        {revealed
-          ? GRADES.map((option) => (
-              <Button
-                className="h-full w-full flex-col rounded-none border-r border-line-2 px-1 py-3 last:border-r-0"
-                disabled={submitting}
-                key={option.grade}
-                onClick={() => void submitGrade(option.grade)}
-                variant="ghost"
-              >
-                <span className={`block text-sm font-semibold ${option.color}`}>
-                  {option.label}
-                </span>
-                <span className="mt-0.5 block font-mono text-[10px] text-ink-3">
-                  {option.key}
-                </span>
-              </Button>
-            ))
-          : null}
-      </div>
-    </Card>
+    </SessionChrome>
   );
 }

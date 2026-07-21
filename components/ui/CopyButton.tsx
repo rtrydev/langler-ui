@@ -39,7 +39,13 @@ export function CopyButton({
   }
 
   return (
-    <Button aria-live="polite" onClick={copy} {...props}>
+    <Button
+      variant="secondary"
+      size="sm"
+      aria-live="polite"
+      onClick={copy}
+      {...props}
+    >
       {copied ? copiedLabel : children}
     </Button>
   );

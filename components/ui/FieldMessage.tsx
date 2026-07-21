@@ -5,7 +5,7 @@ export type FieldMessageTone = "muted" | "error" | "success";
 
 const toneClasses: Record<FieldMessageTone, string> = {
   muted: "text-ink-3",
-  error: "text-crimson",
+  error: "text-vermilion",
   success: "text-success",
 };
 

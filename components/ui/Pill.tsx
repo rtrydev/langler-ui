@@ -4,10 +4,10 @@ import { cn } from "@/lib/cn";
 export type PillTone = "accent" | "vermilion" | "gold" | "crimson";
 
 const selectedToneClasses: Record<PillTone, string> = {
-  accent: "bg-accent",
-  vermilion: "bg-vermilion",
-  gold: "bg-gold",
-  crimson: "bg-crimson",
+  accent: "border-accent-border bg-accent-soft text-accent-strong",
+  vermilion: "border-vermilion-border bg-vermilion-soft text-vermilion",
+  gold: "border-gold-border bg-gold-soft text-gold",
+  crimson: "border-crimson-border bg-crimson-soft text-crimson",
 };
 
 export type PillProps = ComponentProps<"button"> & {
@@ -27,11 +27,11 @@ export function Pill({
       type={type}
       aria-pressed={selected}
       className={cn(
-        "inline-flex cursor-pointer items-center gap-2 rounded-full px-4 py-[7px] text-[13px] transition-colors",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "inline-flex cursor-pointer touch-manipulation items-center gap-1.5 rounded-full border px-[13px] py-1.5 text-[13px] font-[540] shadow-card transition-all duration-150",
+        "focus-visible:shadow-ring focus-visible:outline-none",
         selected
-          ? cn("font-semibold text-on-accent", selectedToneClasses[tone])
-          : "border border-line bg-surface font-medium text-ink-2 hover:text-ink",
+          ? selectedToneClasses[tone]
+          : "border-line bg-surface text-ink-2 hover:-translate-y-px hover:text-ink",
         className,
       )}
       {...props}

@@ -9,7 +9,7 @@ describe("StepProgress", () => {
     const segments = Array.from(el.children) as HTMLElement[];
     expect(segments).toHaveLength(4);
     expect(
-      segments.filter((s) => s.className.includes("bg-accent")),
+      segments.filter((s) => s.className.includes("linear-gradient")),
     ).toHaveLength(2);
     expect(el.getAttribute("aria-valuenow")).toBe("2");
     expect(el.getAttribute("aria-valuemax")).toBe("4");

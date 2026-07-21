@@ -7,7 +7,7 @@ describe("SearchInput", () => {
     render(<SearchInput placeholder="Search tags…" />);
     const el = screen.getByRole("searchbox");
     expect(el.getAttribute("placeholder")).toBe("Search tags…");
-    expect(el.className).toContain("pl-9");
+    expect(el.className).toContain("pl-[38px]");
   });
 
   it("splits className between wrapper and input", () => {

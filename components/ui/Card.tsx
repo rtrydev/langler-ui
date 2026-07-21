@@ -1,15 +1,17 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 
-export type CardElevation = "flat" | "card" | "raised" | "floating";
+export type CardElevation = "flat" | "card" | "raised" | "floating" | "glass";
 export type CardEdgeTone = "accent" | "vermilion" | "gold" | "crimson";
 export type CardPadding = "none" | "sm" | "md" | "lg";
 
 const elevationClasses: Record<CardElevation, string> = {
-  flat: "",
-  card: "shadow-card",
-  raised: "shadow-raised",
-  floating: "shadow-floating",
+  flat: "border-line bg-surface",
+  card: "border-line bg-surface shadow-card",
+  raised: "border-line bg-surface shadow-raised",
+  floating: "border-line bg-surface shadow-floating",
+  glass:
+    "border-glass-line bg-glass shadow-raised backdrop-blur-[18px] backdrop-saturate-150",
 };
 
 const paddingClasses: Record<CardPadding, string> = {
@@ -54,12 +56,9 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl border",
-        dashed
-          ? "border-dashed border-accent-border bg-accent-soft"
-          : "border-line bg-surface",
+        "rounded-lg border",
+        dashed ? "border-dashed border-line" : elevationClasses[elevation],
         edge && edgeClasses[edgeSide][edge],
-        elevationClasses[elevation],
         paddingClasses[padding],
         className,
       )}

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Input } from "@/components/ui/Input";
 import { OptionCard } from "@/components/ui/OptionCard";
+import { cn } from "@/lib/cn";
 import {
   gradeOrthography,
   matchesAnswer,
@@ -48,7 +49,11 @@ export function PolishOrthographyExercise({
                   {seededShuffle(item.options ?? [], `${exercise.exerciseId}-${index}`).map(
                     (option) => (
                       <OptionCard
-                        className={`py-3 text-lg ${checked && option === item.answer ? "border-success" : ""}`}
+                        className={cn(
+                          "py-3 text-lg",
+                          checked && option === item.answer && "!border-success-border !bg-success-soft",
+                          checked && responses[index] === option && option !== item.answer && "!border-vermilion-border !bg-vermilion-soft",
+                        )}
                         key={option}
                         onClick={() => setResponses({ ...responses, [index]: option })}
                         selected={responses[index] === option}
@@ -61,7 +66,10 @@ export function PolishOrthographyExercise({
               ) : (
                 <Input
                   aria-label={`Orthography answer ${index + 1}`}
-                  className={`mt-3 max-w-sm text-lg ${checked ? (correct ? "border-success text-success" : "border-crimson text-crimson") : ""}`}
+                  className={cn(
+                    "mt-3 max-w-sm text-lg",
+                    checked && (correct ? "border-success text-success" : "border-vermilion text-vermilion"),
+                  )}
                   onChange={(event) =>
                     setResponses({ ...responses, [index]: event.target.value })
                   }
@@ -70,7 +78,7 @@ export function PolishOrthographyExercise({
                 />
               )}
               {checked && !correct ? (
-                <p className="mt-2 text-sm text-crimson">
+                <p className="mt-2 text-sm text-vermilion">
                   Correct spelling: <span className="font-semibold">{item.answer}</span>
                 </p>
               ) : null}
@@ -89,15 +97,16 @@ export function PolishOrthographyExercise({
       <div className="mt-7 flex justify-end gap-2">
         {checked ? (
           <>
-            <Button onClick={() => setChecked(false)} variant="secondary">
+            <Button onClick={() => setChecked(false)} size="lg" variant="secondary">
               Try again
             </Button>
-            <Button onClick={() => onComplete(outcome)}>Next →</Button>
+            <Button onClick={() => onComplete(outcome)} size="lg">Next →</Button>
           </>
         ) : (
           <Button
             disabled={items.some((_, index) => !(responses[index] ?? "").trim())}
             onClick={() => setChecked(true)}
+            size="lg"
           >
             Check
           </Button>

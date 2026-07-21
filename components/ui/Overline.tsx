@@ -13,7 +13,7 @@ export function Overline({
   return (
     <Tag
       className={cn(
-        "text-[11px] font-bold tracking-[0.07em] text-ink-3 uppercase",
+        "font-mono text-[11px] font-medium tracking-[0.14em] text-ink-3 uppercase",
         className,
       )}
       {...props}

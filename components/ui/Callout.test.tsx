@@ -8,7 +8,7 @@ describe("Callout", () => {
     const el = screen.getByText("9 items were scheduled for review.")
       .parentElement as HTMLElement;
     expect(el.className).toContain("bg-accent-soft");
-    expect(el.textContent).toContain("ℹ");
+    expect(el.querySelector("svg")).toBeTruthy();
   });
 
   it("uses tone-specific styling and default icons", () => {
@@ -16,7 +16,7 @@ describe("Callout", () => {
     const el = screen.getByText("Temporary password.")
       .parentElement as HTMLElement;
     expect(el.className).toContain("bg-warning-soft");
-    expect(el.textContent).toContain("⚠");
+    expect(el.querySelector("svg")).toBeTruthy();
   });
 
   it("only announces errors as alerts", () => {

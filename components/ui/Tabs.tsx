@@ -16,15 +16,15 @@ export type TabsProps = {
 
 export function Tabs({ items, activeValue, onSelect, className }: TabsProps) {
   return (
-    <div className={cn("flex gap-5 border-b border-line", className)}>
+    <div className={cn("flex gap-[22px] border-b border-line", className)}>
       {items.map((item) => {
         const active = item.value === activeValue;
         const itemClassName = cn(
-          "cursor-pointer border-b-2 px-0.5 pb-2.5 text-sm transition-colors",
-          "focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent",
+          "-mb-px cursor-pointer border-b-2 pb-3 text-sm font-[540] transition-colors",
+          "focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-accent",
           active
-            ? "border-accent font-semibold text-accent"
-            : "border-transparent text-ink-3 hover:text-ink-2",
+            ? "border-accent text-ink"
+            : "border-transparent text-ink-3 hover:text-ink",
         );
         return item.href ? (
           <a

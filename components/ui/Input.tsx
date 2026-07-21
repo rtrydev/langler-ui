@@ -10,10 +10,11 @@ export function Input({ invalid = false, className, ...props }: InputProps) {
     <input
       aria-invalid={invalid || undefined}
       className={cn(
-        "w-full rounded-lg border bg-surface px-3 py-2.5 text-base text-ink placeholder:text-ink-3 sm:text-sm",
-        "focus:border-accent focus:ring-[3px] focus:ring-accent-soft focus:outline-none",
+        "h-10 w-full rounded-md border bg-surface px-[13px] text-base text-ink shadow-field transition-[border-color,box-shadow] duration-150 placeholder:text-ink-3 focus:outline-none sm:text-sm",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        invalid ? "border-crimson" : "border-line",
+        invalid
+          ? "border-vermilion focus:border-vermilion focus:shadow-[0_0_0_3px_color-mix(in_oklch,var(--vermilion),transparent_66%)]"
+          : "border-line focus:border-accent focus:shadow-ring",
         className,
       )}
       {...props}

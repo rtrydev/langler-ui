@@ -26,15 +26,12 @@ export function SegmentedControl({
   return (
     <div
       className={cn(
-        "inline-flex overflow-hidden rounded-[7px] border border-line bg-surface",
+        "inline-flex gap-0.5 rounded-md border border-line bg-tint p-[3px]",
         className,
       )}
     >
       {options.map((option) => (
-        <label
-          key={option.value}
-          className="cursor-pointer border-l border-line first:border-l-0"
-        >
+        <label key={option.value} className="cursor-pointer touch-manipulation">
           <input
             type="radio"
             className="peer sr-only"
@@ -52,9 +49,9 @@ export function SegmentedControl({
           />
           <span
             className={cn(
-              "block px-3 py-1.5 text-xs text-ink-2 select-none",
-              "peer-checked:bg-accent peer-checked:text-on-accent",
-              "peer-focus-visible:outline-2 peer-focus-visible:-outline-offset-2 peer-focus-visible:outline-accent",
+              "block rounded-[8px] px-[13px] py-1.5 text-[13px] font-[540] text-ink-2 transition-all duration-150 select-none",
+              "peer-checked:bg-surface peer-checked:text-ink peer-checked:shadow-card",
+              "peer-focus-visible:shadow-ring peer-focus-visible:outline-none",
             )}
           >
             {option.label}

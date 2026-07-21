@@ -54,7 +54,7 @@ export function TokenCreateForm({
         />
       </div>
       <fieldset>
-        <legend className="mb-2 text-[13px] font-semibold text-ink">
+        <legend className="mb-1.5 block text-[13px] font-[540] text-ink">
           Scopes
         </legend>
         <div className="flex flex-wrap gap-2">

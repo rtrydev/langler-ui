@@ -18,15 +18,19 @@ export function StepProgress({
       aria-valuenow={completed}
       aria-valuemin={0}
       aria-valuemax={total}
-      className={cn("flex gap-[5px]", className)}
+      className={cn("flex gap-1.5", className)}
       {...props}
     >
       {Array.from({ length: total }, (_, i) => (
         <span
           key={i}
           className={cn(
-            "h-[5px] flex-1 rounded-[3px]",
-            i < completed ? "bg-accent" : "bg-line",
+            "h-2 flex-1 rounded-full",
+            i < completed
+              ? "bg-accent bg-[linear-gradient(90deg,var(--accent-hi),var(--accent))]"
+              : i === completed
+                ? "bg-accent-soft"
+                : "bg-tint",
           )}
         />
       ))}

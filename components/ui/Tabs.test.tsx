@@ -15,7 +15,7 @@ describe("Tabs", () => {
     );
     const active = screen.getByRole("button", { name: "Vocabulary" });
     expect(active.getAttribute("aria-pressed")).toBe("true");
-    expect(active.className).toContain("text-accent");
+    expect(active.className).toContain("text-ink");
     fireEvent.click(screen.getByRole("button", { name: "Grammar" }));
     expect(onSelect).toHaveBeenCalledWith("grammar");
   });

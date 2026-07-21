@@ -148,9 +148,9 @@ export function CreateLessonWizard() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <Stepper
-        className="mb-8 max-w-xl"
+        className="mb-8 px-2"
         current={step}
         onStepSelect={(index) => {
           if (index < step) {

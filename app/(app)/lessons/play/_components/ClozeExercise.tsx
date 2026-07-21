@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Input } from "@/components/ui/Input";
+import { cn } from "@/lib/cn";
 import { gradeCloze, matchesAnswer, seededShuffle } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
@@ -54,7 +55,10 @@ export function ClozeExercise({ exercise, onComplete }: ExercisePlayerProps) {
             return (
               <Input
                 aria-label={`Blank ${blankIndex}`}
-                className={`mx-1 inline-block w-36 rounded-b-none border-x-0 border-t-0 px-2 text-center font-jp text-lg ${checked ? (correct ? "border-success text-success" : "border-crimson text-crimson") : "border-accent bg-accent-soft"}`}
+                className={cn(
+                  "mx-1 inline-block w-36 rounded-b-none border-x-0 border-t-0 px-2 text-center font-jp text-lg",
+                  checked ? (correct ? "border-success text-success" : "border-vermilion text-vermilion") : "border-accent bg-accent-soft",
+                )}
                 disabled={checked}
                 key={`blank-${blankIndex}`}
                 onChange={(event) => setResponses({ ...responses, [blankIndex]: event.target.value })}
@@ -67,15 +71,17 @@ export function ClozeExercise({ exercise, onComplete }: ExercisePlayerProps) {
           return (
             <button
               aria-label={`Blank ${blankIndex}`}
-              className={`mx-1 inline-block min-w-24 border-b-2 px-2 text-center font-jp text-lg ${
+              className={cn(
+                "mx-1 inline-block min-w-24 rounded-sm border-b-2 px-2 text-center font-jp text-lg transition-colors",
                 checked
                   ? correct
                     ? "border-success text-success"
-                    : "border-crimson text-crimson"
+                    : "border-vermilion text-vermilion"
                   : targetBlank === blankIndex
-                    ? "border-accent bg-accent-soft"
-                    : "border-line-2"
-              } ${!checked ? "cursor-pointer" : ""}`}
+                    ? "border-accent bg-accent-soft text-accent-strong"
+                    : "border-line hover:border-ink-3",
+                !checked && "cursor-pointer",
+              )}
               disabled={checked}
               key={`blank-${blankIndex}`}
               onClick={() => (filled ? clearBlank(blankIndex) : setActiveBlank(blankIndex))}
@@ -87,17 +93,23 @@ export function ClozeExercise({ exercise, onComplete }: ExercisePlayerProps) {
         })}
       </div>
       {wordBank.length ? (
-        <div className="mt-6 flex max-w-3xl flex-wrap gap-2 rounded-xl border border-line-2 bg-paper p-3">
+        <div className="mt-6 flex max-w-3xl flex-wrap gap-2 rounded-lg border border-line bg-surface-2 p-3">
           {wordBank.map((word) => (
-            <Button
-              className={`font-jp ${usedWords.has(word) ? "opacity-40" : ""}`}
+            <button
+              className={cn(
+                "inline-flex items-center rounded-md border px-4 py-[9px] font-jp text-sm shadow-card transition-all duration-150 select-none",
+                "focus-visible:shadow-ring focus-visible:outline-none disabled:cursor-not-allowed",
+                usedWords.has(word)
+                  ? "border-line bg-tint text-ink-3 line-through"
+                  : "border-line bg-surface text-ink hover:-translate-y-px hover:border-ink-3",
+              )}
               disabled={checked}
               key={word}
               onClick={() => pickWord(word)}
-              variant="secondary"
+              type="button"
             >
               {word}
-            </Button>
+            </button>
           ))}
         </div>
       ) : null}
@@ -112,11 +124,11 @@ export function ClozeExercise({ exercise, onComplete }: ExercisePlayerProps) {
       <div className="mt-7 flex justify-end gap-2">
         {checked ? (
           <>
-            <Button onClick={() => setChecked(false)} variant="secondary">Try again</Button>
-            <Button onClick={() => onComplete(outcome)}>Next →</Button>
+            <Button onClick={() => setChecked(false)} size="lg" variant="secondary">Try again</Button>
+            <Button onClick={() => onComplete(outcome)} size="lg">Next →</Button>
           </>
         ) : (
-          <Button disabled={blanks.some((blank) => !(responses[blank.index] ?? "").trim())} onClick={() => setChecked(true)}>Check</Button>
+          <Button disabled={blanks.some((blank) => !(responses[blank.index] ?? "").trim())} onClick={() => setChecked(true)} size="lg">Check</Button>
         )}
       </div>
     </div>

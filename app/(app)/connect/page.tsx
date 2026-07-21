@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { PageHeader } from "@/components/PageHeader";
 import { Card } from "@/components/ui/Card";
+import { GlyphTile } from "@/components/ui/GlyphTile";
 import { Heading } from "@/components/ui/Heading";
 import { harnessAssets } from "@/lib/harness";
 import { HarnessPanel } from "./_components/HarnessPanel";
@@ -23,21 +25,33 @@ export default function ConnectPage() {
   const machineApiUrl = process.env.NEXT_PUBLIC_MACHINE_API_URL;
   return (
     <div className="mx-auto max-w-3xl">
-      <Heading as="h1" size="lg">Connect your agent</Heading>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-2">
-        Give a coding agent the framework-agnostic harness and a scoped token,
-        and it can ground, compose, and import lessons through the Langler API.
-      </p>
+      <PageHeader
+        kicker="Connect"
+        title="Connect your agent"
+        description="Give a coding agent the framework-agnostic harness and a scoped token, and it can ground, compose, and import lessons through the Langler API."
+      />
 
-      <div className="my-6 flex items-center gap-3 rounded-xl border border-line bg-surface p-4 sm:gap-5 sm:p-5">
-        <div className="flex-1 rounded-[9px] border border-line bg-paper p-3 text-center">
-          <div aria-hidden className="text-2xl">🤖</div>
-          <div className="mt-1 text-xs font-semibold">Your agent</div>
+      <div
+        aria-hidden
+        className="mb-6 flex items-center gap-3 rounded-xl border border-line bg-surface p-4 sm:gap-5 sm:p-5"
+      >
+        <div className="flex-1 text-center">
+          <GlyphTile className="mx-auto size-16 font-mono text-lg font-bold text-ink">
+            {">_"}
+          </GlyphTile>
+          <div className="mt-2 text-xs font-semibold">Your agent</div>
         </div>
-        <div aria-hidden className="font-mono text-xl text-accent">⇄</div>
-        <div className="flex-1 rounded-[9px] border border-line bg-paper p-3 text-center">
-          <div aria-hidden className="font-jp-serif text-2xl text-accent">語</div>
-          <div className="mt-1 text-xs font-semibold">Langler API</div>
+        <div className="flex flex-1 flex-col items-center gap-1.5">
+          <div className="w-full border-t border-dashed border-accent-border" />
+          <span className="font-mono text-[10px] tracking-wide whitespace-nowrap text-accent">
+            HTTPS · Bearer
+          </span>
+        </div>
+        <div className="flex-1 text-center">
+          <GlyphTile className="mx-auto size-16 font-jp-serif text-2xl text-accent">
+            語
+          </GlyphTile>
+          <div className="mt-2 text-xs font-semibold">Langler API</div>
         </div>
       </div>
 
@@ -46,10 +60,10 @@ export default function ConnectPage() {
         <HarnessPanel assets={harnessAssets(machineApiUrl)} />
       </Card>
 
-      <ol className="grid gap-3">
+      <ol className="grid gap-px overflow-hidden rounded-lg border border-line bg-line">
         {steps.map((step, index) => (
-          <li className="flex gap-3" key={step.title}>
-            <span className="grid size-[22px] shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-on-accent">
+          <li className="flex gap-3 bg-surface p-4" key={step.title}>
+            <span className="shrink-0 font-mono text-xs font-bold text-accent">
               {index + 1}
             </span>
             <p className="text-[13px] leading-relaxed text-ink-2">

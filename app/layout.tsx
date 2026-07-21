@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   IBM_Plex_Mono,
   Inter,
@@ -6,12 +6,19 @@ import {
   Noto_Sans_Myanmar,
   Noto_Serif,
   Noto_Serif_JP,
+  Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const notoSerif = Noto_Serif({
@@ -47,7 +54,22 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "Langler",
   description: "Your languages. Your AI. One notebook.",
+  appleWebApp: {
+    capable: true,
+    title: "Langler",
+    statusBarStyle: "default",
+  },
 };
+
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f9f7f3" },
+    { media: "(prefers-color-scheme: dark)", color: "#0d0f15" },
+  ],
+};
+
+const themeInitScript = `(function(){try{var t=localStorage.getItem('langler-theme');var d=document.documentElement;if(t==='light'||t==='dark'){d.setAttribute('data-theme',t);var m=document.createElement('meta');m.setAttribute('name','theme-color');m.setAttribute('data-runtime','');m.setAttribute('content',t==='dark'?'#0d0f15':'#f9f7f3');document.head.insertBefore(m,document.head.firstChild);}}catch(e){}})();`;
 
 export default function RootLayout({
   children,
@@ -57,9 +79,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${notoSerif.variable} ${notoSansJp.variable} ${notoSerifJp.variable} ${notoSansMyanmar.variable} ${plexMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${spaceGrotesk.variable} ${notoSerif.variable} ${notoSansJp.variable} ${notoSerifJp.variable} ${notoSansMyanmar.variable} ${plexMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }

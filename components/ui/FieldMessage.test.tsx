@@ -16,7 +16,7 @@ describe("FieldMessage", () => {
     );
     expect(
       screen.getByText("Passwords don't match.").className,
-    ).toContain("text-crimson");
+    ).toContain("text-vermilion");
 
     render(<FieldMessage tone="success">Looks good</FieldMessage>);
     expect(screen.getByText("Looks good").className).toContain(

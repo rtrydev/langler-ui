@@ -15,8 +15,8 @@ export function Select({
     <div className={cn("relative inline-block", className)}>
       <select
         className={cn(
-          "w-full cursor-pointer appearance-none rounded-lg border border-line bg-surface py-2 pr-8 pl-3 text-[13px] font-medium text-ink",
-          "focus:border-accent focus:ring-[3px] focus:ring-accent-soft focus:outline-none",
+          "h-10 w-full cursor-pointer appearance-none rounded-md border border-line bg-surface pr-9 pl-[13px] text-sm font-medium text-ink shadow-field transition-[border-color,box-shadow] duration-150",
+          "focus:border-accent focus:shadow-ring focus:outline-none",
           "disabled:cursor-not-allowed disabled:opacity-50",
           selectClassName,
         )}
@@ -26,7 +26,7 @@ export function Select({
       </select>
       <span
         aria-hidden
-        className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-[11px] text-ink-3"
+        className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 font-mono text-[11px] text-ink-3"
       >
         ▾
       </span>

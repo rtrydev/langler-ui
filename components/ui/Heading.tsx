@@ -4,10 +4,10 @@ import { cn } from "@/lib/cn";
 export type HeadingSize = "sm" | "md" | "lg" | "xl";
 
 const sizeClasses: Record<HeadingSize, string> = {
-  sm: "text-[19px]",
-  md: "text-[22px]",
+  sm: "text-[18px]",
+  md: "text-[20px]",
   lg: "text-2xl",
-  xl: "text-[27px]",
+  xl: "text-[28px]",
 };
 
 export type HeadingProps = ComponentProps<"h1"> & {
@@ -24,7 +24,7 @@ export function Heading({
   return (
     <Tag
       className={cn(
-        "font-bold tracking-[-0.02em] text-ink",
+        "font-display font-semibold tracking-[-0.02em] text-ink",
         sizeClasses[size],
         className,
       )}

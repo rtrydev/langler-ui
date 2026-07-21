@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FilterBar } from "@/components/FilterBar";
+import { LoadingState } from "@/components/LoadingState";
+import { PageHeader } from "@/components/PageHeader";
 import { useSession } from "@/components/SessionContext";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Heading } from "@/components/ui/Heading";
-import { Pill } from "@/components/ui/Pill";
 import { SearchInput } from "@/components/ui/SearchInput";
 import { Select } from "@/components/ui/Select";
 import { listLessons, type LessonSummary } from "@/lib/api/lessons";
@@ -46,23 +47,22 @@ export function LessonLibrary() {
   }, [session]);
 
   const header = (
-    <div className="mb-6 flex items-center justify-between gap-4">
-      <Heading as="h1" size="lg">
-        Lessons
-      </Heading>
-      <Link href="/create/">
-        <Button>+ New lesson</Button>
-      </Link>
-    </div>
+    <PageHeader
+      kicker="Library"
+      title="Lessons"
+      action={
+        <Link href="/create/">
+          <Button>+ New lesson</Button>
+        </Link>
+      }
+    />
   );
 
   if (state.kind === "loading") {
     return (
       <div>
         {header}
-        <p className="font-mono text-sm text-ink-2" role="status">
-          Opening your library…
-        </p>
+        <LoadingState>Opening your library…</LoadingState>
       </div>
     );
   }
@@ -114,37 +114,25 @@ export function LessonLibrary() {
   return (
     <div>
       {header}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {presentLanguages.length > 1 ? (
-          <>
-          <Pill
-            onClick={() => selectLanguage("")}
-            selected={languageFilter === ""}
-          >
-            All languages
-          </Pill>
-          {presentLanguages.map((language) => (
-            <Pill
-              key={language.code}
-              onClick={() => selectLanguage(language.code)}
-              selected={languageFilter === language.code}
-              tone={language.tone}
-            >
-              {language.englishName}
-            </Pill>
-          ))}
-          </>
-        ) : null}
+      <FilterBar
+        languages={presentLanguages.map((language) => ({
+          value: language.code,
+          label: language.englishName,
+          tone: language.tone,
+        }))}
+        activeLanguage={languageFilter}
+        onLanguageChange={selectLanguage}
+      >
         <Select aria-label="Filter by level" onChange={(event) => setLevelFilter(event.target.value)} value={levelFilter}><option value="">All levels</option>{levels.map((level) => <option key={level} value={level}>{level}</option>)}</Select>
         <Select aria-label="Filter by topic" onChange={(event) => setTopicFilter(event.target.value)} value={topicFilter}><option value="">All topics</option>{topics.map((topic) => <option key={topic} value={topic}>{topic}</option>)}</Select>
-        <SearchInput aria-label="Filter by tag" className="min-w-44 flex-1" onChange={(event) => setTagFilter(event.target.value)} placeholder="Search tags…" value={tagFilter} />
-      </div>
+        <SearchInput aria-label="Filter by tag" className="min-w-44" onChange={(event) => setTagFilter(event.target.value)} placeholder="Search tags…" value={tagFilter} />
+      </FilterBar>
       <div className="grid gap-4 sm:grid-cols-2">
         {filtered.map((lesson) => (
           <LessonCard key={lesson.lessonId} lesson={lesson} />
         ))}
       </div>
-      {filtered.length === 0 ? <p className="rounded-xl border border-dashed border-line p-8 text-center text-sm text-ink-2">No lessons match these filters.</p> : null}
+      {filtered.length === 0 ? <p className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-sm text-ink-2">No lessons match these filters.</p> : null}
     </div>
   );
 }

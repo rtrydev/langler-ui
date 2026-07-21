@@ -14,10 +14,11 @@ export function Textarea({
     <textarea
       aria-invalid={invalid || undefined}
       className={cn(
-        "min-h-24 w-full rounded-[11px] border bg-surface px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-ink-3",
-        "focus:border-accent focus:ring-[3px] focus:ring-accent-soft focus:outline-none",
+        "min-h-24 w-full resize-y rounded-md border bg-surface px-[13px] py-[11px] text-sm leading-relaxed text-ink shadow-field transition-[border-color,box-shadow] duration-150 placeholder:text-ink-3 focus:outline-none",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        invalid ? "border-crimson" : "border-line",
+        invalid
+          ? "border-vermilion focus:border-vermilion focus:shadow-[0_0_0_3px_color-mix(in_oklch,var(--vermilion),transparent_66%)]"
+          : "border-line focus:border-accent focus:shadow-ring",
         className,
       )}
       {...props}

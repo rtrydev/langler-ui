@@ -7,6 +7,7 @@ import { SessionProvider } from "@/components/SessionContext";
 import { ForgotPasswordForm } from "@/components/ForgotPasswordForm";
 import { NewPasswordForm } from "@/components/NewPasswordForm";
 import { SignInForm } from "@/components/SignInForm";
+import { LoadingState } from "@/components/LoadingState";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { Divider } from "@/components/ui/Divider";
@@ -45,10 +46,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (state.kind === "loading") {
     return (
-      <main className="grid min-h-screen place-items-center bg-paper px-5">
-        <p className="font-mono text-sm text-ink-2" role="status">
-          Opening your notebook…
-        </p>
+      <main className="paper-grid grid min-h-screen place-items-center px-5">
+        <LoadingState>Opening your notebook…</LoadingState>
       </main>
     );
   }
@@ -56,18 +55,16 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (state.kind === "authenticated") {
     return (
       <SessionProvider session={state.session}>
-        <AppShell onSignOut={() => setState({ kind: "signed-out" })}>
-          {children}
-        </AppShell>
+        <AppShell>{children}</AppShell>
       </SessionProvider>
     );
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-paper px-5 py-[34px] sm:px-6 sm:py-12">
+    <main className="paper-grid grid min-h-screen place-items-center px-5 py-8 sm:px-6 sm:py-12">
       <Card
-        className="w-full max-w-[360px] px-[26px] py-[30px] sm:px-[34px] sm:py-[38px]"
-        elevation="card"
+        className="w-full max-w-[360px] rounded-xl px-[26px] py-[30px] sm:px-[34px] sm:py-[38px]"
+        elevation="raised"
         padding="none"
       >
         {state.kind === "new-password" ? (
@@ -117,8 +114,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
                     setState({ kind: "new-password", challenge })
                   }
                 />
-                <Divider className="mt-[22px] mb-[18px]" />
-                <p className="text-center text-[11.5px] leading-5 text-ink-3">
+                <Divider className="mt-5 mb-[18px]" />
+                <p className="text-center text-[11px] leading-5 text-ink-3">
                   Accounts are provisioned by the owner.
                   <br />
                   There is no public sign-up.
