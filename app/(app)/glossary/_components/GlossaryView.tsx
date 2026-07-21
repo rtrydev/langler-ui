@@ -2,19 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { FilterBar } from "@/components/FilterBar";
+import { LoadingState } from "@/components/LoadingState";
+import { PageHeader } from "@/components/PageHeader";
 import { useSession } from "@/components/SessionContext";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Heading } from "@/components/ui/Heading";
-import { Pill } from "@/components/ui/Pill";
+import { Overline } from "@/components/ui/Overline";
 import { SearchInput } from "@/components/ui/SearchInput";
+import { StatusDot } from "@/components/ui/StatusDot";
 import {
   getGlossary,
   type GlossaryLanguage,
   type GlossaryWord,
 } from "@/lib/api/glossary";
-import { LANGUAGES, levelLabel } from "@/lib/lesson-catalog";
+import { LANGUAGES, languageOption, levelLabel } from "@/lib/lesson-catalog";
 
 type GlossaryState =
   | { kind: "loading" }
@@ -39,18 +43,34 @@ function addedLabel(value: string): string {
   }).format(added);
 }
 
+const HEADWORD_FONT: Record<string, string> = {
+  ja: "font-jp-serif",
+  my: "font-myanmar",
+  pl: "font-serif",
+};
+
 function WordRow({ word, language }: { word: GlossaryWord; language: string }) {
   return (
-    <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-line-2 py-3 last:border-b-0">
-      <span className="font-jp-serif text-xl text-ink">{word.headword}</span>
-      {word.reading ? (
-        <span className="text-sm text-ink-2">{word.reading}</span>
-      ) : null}
-      <span className="min-w-40 flex-1 text-sm text-ink">
+    <li className="-mx-2 flex flex-col gap-1.5 px-2 py-3 transition-colors hover:bg-tint sm:flex-row sm:flex-wrap sm:items-baseline sm:gap-x-4 sm:gap-y-1">
+      <span className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <span
+          className={`text-[15px] text-ink ${HEADWORD_FONT[language] ?? "font-serif"}`}
+        >
+          {word.headword}
+        </span>
+        {word.reading ? (
+          <span className="font-mono text-[13px] text-ink-3">
+            {word.reading}
+          </span>
+        ) : null}
+      </span>
+      <span className="text-sm text-ink sm:min-w-40 sm:flex-1">
         {word.gloss.join("; ")}
       </span>
-      <span className="ml-auto flex items-baseline gap-3 text-[11px] text-ink-3">
-        {word.level ? <span>{levelLabel(language, word.level)}</span> : null}
+      <span className="flex min-h-6 flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-ink-3 sm:ml-auto">
+        {word.level ? (
+          <Badge tone="neutral">{levelLabel(language, word.level)}</Badge>
+        ) : null}
         <span>
           {word.lessonCount} {word.lessonCount === 1 ? "lesson" : "lessons"}
         </span>
@@ -82,23 +102,18 @@ export function GlossaryView() {
   }, [session]);
 
   const header = (
-    <div className="mb-6">
-      <Heading as="h1" size="lg">
-        Glossary
-      </Heading>
-      <p className="mt-1 text-sm text-ink-2">
-        Every word your lessons have introduced so far.
-      </p>
-    </div>
+    <PageHeader
+      kicker="Glossary"
+      title="Glossary"
+      description="Every word your lessons have introduced so far."
+    />
   );
 
   if (state.kind === "loading") {
     return (
       <div>
         {header}
-        <p className="font-mono text-sm text-ink-2" role="status">
-          Opening your glossary…
-        </p>
+        <LoadingState>Opening your glossary…</LoadingState>
       </div>
     );
   }
@@ -145,52 +160,39 @@ export function GlossaryView() {
   return (
     <div>
       {header}
-      <div className="mb-5 flex flex-wrap gap-2">
-        {presentLanguages.length > 1 ? (
-          <>
-            <Pill
-              onClick={() => setLanguageFilter("")}
-              selected={languageFilter === ""}
-            >
-              All languages
-            </Pill>
-            {presentLanguages.map((language) => (
-              <Pill
-                key={language.code}
-                onClick={() => setLanguageFilter(language.code)}
-                selected={languageFilter === language.code}
-                tone={language.tone}
-              >
-                {language.englishName}
-              </Pill>
-            ))}
-          </>
-        ) : null}
+      <FilterBar
+        languages={presentLanguages.map((language) => ({
+          value: language.code,
+          label: language.englishName,
+          tone: language.tone,
+        }))}
+        activeLanguage={languageFilter}
+        onLanguageChange={setLanguageFilter}
+      >
         <SearchInput
           aria-label="Search words"
-          className="min-w-44 flex-1"
+          className="min-w-44"
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Search words…"
           value={search}
         />
-      </div>
+      </FilterBar>
       {visible.map((group) => {
         if (group.words.length === 0) return null;
-        const option = LANGUAGES.find(
-          (language) => language.code === group.language,
-        );
+        const option = languageOption(group.language);
         return (
           <section className="mb-8" key={group.language}>
-            <div className="mb-1 flex items-baseline gap-3">
-              <Heading as="h2" size="sm">
+            <div className="paper-grid sticky top-0 z-10 -mx-2 mb-1 flex items-baseline gap-3 px-2 py-2">
+              <StatusDot tone={option?.tone ?? "neutral"} className="self-center" />
+              <h2 className="font-display text-[18px] font-semibold tracking-[-0.02em] text-ink">
                 {option?.englishName ?? group.language}
-              </Heading>
-              <span className="text-xs text-ink-3">
+              </h2>
+              <Overline as="span">
                 {group.words.length}{" "}
                 {group.words.length === 1 ? "word" : "words"}
-              </span>
+              </Overline>
             </div>
-            <ul>
+            <ul className="divide-y divide-line-2">
               {group.words.map((word) => (
                 <WordRow
                   key={word.itemId}
@@ -203,7 +205,7 @@ export function GlossaryView() {
         );
       })}
       {totalVisible === 0 ? (
-        <p className="rounded-xl border border-dashed border-line p-8 text-center text-sm text-ink-2">
+        <p className="rounded-lg border border-dashed border-line bg-surface p-8 text-center text-sm text-ink-2">
           No words match this search.
         </p>
       ) : null}

@@ -14,13 +14,13 @@ export function Progress({ value, className, ...props }: ProgressProps) {
       aria-valuemin={0}
       aria-valuemax={100}
       className={cn(
-        "h-[5px] overflow-hidden rounded-[3px] bg-line-2",
+        "h-2 overflow-hidden rounded-full bg-tint shadow-field",
         className,
       )}
       {...props}
     >
       <div
-        className="h-full rounded-[3px] bg-accent"
+        className="h-full rounded-full bg-accent bg-[linear-gradient(90deg,var(--accent-hi),var(--accent))]"
         style={{ width: `${clamped}%` }}
       />
     </div>

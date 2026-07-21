@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { OptionCard } from "@/components/ui/OptionCard";
+import { cn } from "@/lib/cn";
 import { gradeMultipleChoice, seededShuffle } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
@@ -32,7 +33,11 @@ export function MultipleChoiceExercise({ exercise, onComplete }: ExercisePlayerP
               <div className="mt-3 grid gap-2">
                 {options.map((option) => (
                   <OptionCard
-                    className={`font-jp py-3 ${checked && option === question.answer ? "border-success" : ""}`}
+                    className={cn(
+                      "font-jp py-3",
+                      checked && option === question.answer && "!border-success-border !bg-success-soft",
+                      checked && responses[questionIndex] === option && option !== question.answer && "!border-vermilion-border !bg-vermilion-soft",
+                    )}
                     key={option}
                     onClick={() => setResponses({ ...responses, [questionIndex]: option })}
                     selected={responses[questionIndex] === option}
@@ -42,7 +47,7 @@ export function MultipleChoiceExercise({ exercise, onComplete }: ExercisePlayerP
                 ))}
               </div>
               {wrong ? (
-                <p className="mt-2 text-sm text-crimson">
+                <p className="mt-2 text-sm text-vermilion">
                   Correct answer: <span className="font-jp">{question.answer}</span>
                 </p>
               ) : null}
@@ -57,11 +62,12 @@ export function MultipleChoiceExercise({ exercise, onComplete }: ExercisePlayerP
       ) : null}
       <div className="mt-7 flex justify-end">
         {checked ? (
-          <Button onClick={() => onComplete(outcome)}>Next →</Button>
+          <Button onClick={() => onComplete(outcome)} size="lg">Next →</Button>
         ) : (
           <Button
             disabled={questions.some((_, index) => !responses[index])}
             onClick={() => setChecked(true)}
+            size="lg"
           >
             Check
           </Button>

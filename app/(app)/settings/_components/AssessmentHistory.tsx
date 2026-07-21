@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
 import { useSession } from "@/components/SessionContext";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -62,9 +63,7 @@ export function AssessmentHistory() {
       </div>
 
       {state.kind === "loading" ? (
-        <p className="font-mono text-sm text-ink-2" role="status">
-          Loading your placement history…
-        </p>
+        <LoadingState>Loading your placement history…</LoadingState>
       ) : null}
 
       {state.kind === "error" ? (
@@ -72,12 +71,10 @@ export function AssessmentHistory() {
       ) : null}
 
       {state.kind === "ready" && state.items.length === 0 ? (
-        <Card dashed>
-          <EmptyState
-            description={'Take one to stop guessing what "intermediate" means.'}
-            title="No placement tests yet"
-          />
-        </Card>
+        <EmptyState
+          description={'Take one to stop guessing what "intermediate" means.'}
+          title="No placement tests yet"
+        />
       ) : null}
 
       {state.kind === "ready" && state.items.length > 0 ? (
@@ -86,39 +83,43 @@ export function AssessmentHistory() {
             const language = languageOption(item.language);
             return (
               <Card
-                className="flex flex-wrap items-center gap-x-4 gap-y-2"
+                className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-2"
                 key={item.assessmentId}
               >
-                <p className="text-sm font-semibold text-ink">
-                  {language?.englishName ?? item.language}
-                </p>
-                {item.status === "completed" && item.estimatedLevel ? (
-                  <>
-                    <p className="text-sm text-ink-2">
-                      ≈{" "}
-                      <strong className="text-ink">
-                        {levelLabel(item.language, item.estimatedLevel)}
-                      </strong>
-                    </p>
-                    {item.confidence ? (
-                      <Badge tone="muted">{item.confidence} confidence</Badge>
-                    ) : null}
-                  </>
-                ) : (
-                  <Badge tone="warning">In progress</Badge>
-                )}
-                <p className="ml-auto text-xs text-ink-3">
-                  {shortDate(item.completedAt ?? item.startedAt)}
-                </p>
-                {item.status === "in_progress" ? (
-                  <Link
-                    href={`/assess/?id=${encodeURIComponent(item.assessmentId)}`}
-                  >
-                    <Button size="sm" variant="secondary">
-                      Resume
-                    </Button>
-                  </Link>
-                ) : null}
+                <div className="flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2">
+                  <p className="text-sm font-semibold text-ink">
+                    {language?.englishName ?? item.language}
+                  </p>
+                  {item.status === "completed" && item.estimatedLevel ? (
+                    <>
+                      <p className="font-mono text-sm text-ink-2">
+                        ≈{" "}
+                        <strong className="text-ink">
+                          {levelLabel(item.language, item.estimatedLevel)}
+                        </strong>
+                      </p>
+                      {item.confidence ? (
+                        <Badge tone="accent">{item.confidence} confidence</Badge>
+                      ) : null}
+                    </>
+                  ) : (
+                    <Badge tone="warning">In progress</Badge>
+                  )}
+                </div>
+                <div className="flex min-h-8 items-center justify-between gap-3 sm:ml-auto sm:justify-start">
+                  <p className="font-mono text-xs text-ink-3">
+                    {shortDate(item.completedAt ?? item.startedAt)}
+                  </p>
+                  {item.status === "in_progress" ? (
+                    <Link
+                      href={`/assess/?id=${encodeURIComponent(item.assessmentId)}`}
+                    >
+                      <Button size="sm" variant="secondary">
+                        Resume
+                      </Button>
+                    </Link>
+                  ) : null}
+                </div>
               </Card>
             );
           })}

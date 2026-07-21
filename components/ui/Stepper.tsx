@@ -35,10 +35,12 @@ export function Stepper({
             >
               <span
                 className={cn(
-                  "flex size-[26px] shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                  done || active
-                    ? "bg-accent text-on-accent"
-                    : "border border-line bg-surface text-ink-3",
+                  "flex size-7 shrink-0 items-center justify-center rounded-full font-mono text-[13px] font-[560]",
+                  active
+                    ? "border border-accent-strong bg-accent bg-[linear-gradient(180deg,var(--accent-hi),var(--accent))] text-on-accent"
+                    : done
+                      ? "bg-accent-soft text-accent-strong"
+                      : "border border-line bg-surface text-ink-3",
                 )}
               >
                 {done ? "✓" : index + 1}
@@ -46,7 +48,7 @@ export function Stepper({
               <span
                 className={cn(
                   "text-[13px]",
-                  active && "font-bold text-ink",
+                  active && "font-[560] text-ink",
                   done && "font-medium text-ink",
                   !done && !active && "font-medium text-ink-3",
                 )}

@@ -55,7 +55,7 @@ export function DrawingPad({
     context.lineWidth = 5;
     context.lineCap = "round";
     context.lineJoin = "round";
-    context.strokeStyle = "#1f1d1a";
+    context.strokeStyle = getComputedStyle(event.currentTarget).color;
     context.lineTo(current.x, current.y);
     context.stroke();
   }
@@ -69,7 +69,10 @@ export function DrawingPad({
       ) : null}
       <canvas
         aria-label="Drawing practice area"
-        className={cn("absolute inset-0 size-full touch-none cursor-crosshair", className)}
+        className={cn(
+          "absolute inset-0 size-full cursor-crosshair touch-none text-ink",
+          className,
+        )}
         height={320}
         onPointerDown={start}
         onPointerMove={move}

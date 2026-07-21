@@ -28,7 +28,7 @@ describe("Button", () => {
     );
     const el = screen.getByRole("button");
     expect(el.className).toContain("border-line");
-    expect(el.className).toContain("px-6");
+    expect(el.className).toContain("px-[22px]");
   });
 
   it("supports link-styled actions without inventing an anchor destination", () => {

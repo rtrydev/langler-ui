@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 
 export type GlossaryApiError = {
@@ -60,9 +62,7 @@ export async function getGlossary(
   if (language) query.set("language", language);
   const suffix = query.size > 0 ? `?${query}` : "";
   try {
-    const response = await fetch(`${apiUrl}/glossary${suffix}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/glossary${suffix}`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }

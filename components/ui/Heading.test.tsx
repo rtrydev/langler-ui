@@ -6,7 +6,7 @@ describe("Heading", () => {
   it("renders an h2 at the md size by default", () => {
     render(<Heading>Lessons</Heading>);
     const el = screen.getByRole("heading", { level: 2, name: "Lessons" });
-    expect(el.className).toContain("text-[22px]");
+    expect(el.className).toContain("text-[20px]");
   });
 
   it("renders the requested tag and size", () => {
@@ -16,6 +16,6 @@ describe("Heading", () => {
       </Heading>,
     );
     const el = screen.getByRole("heading", { level: 1 });
-    expect(el.className).toContain("text-[27px]");
+    expect(el.className).toContain("text-[28px]");
   });
 });

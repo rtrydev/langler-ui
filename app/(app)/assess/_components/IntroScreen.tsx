@@ -1,11 +1,18 @@
 "use client";
 
 import { LanguagePicker } from "@/components/LanguagePicker";
+import { PageHeader } from "@/components/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
-import { Heading } from "@/components/ui/Heading";
+import { StatusCircle } from "@/components/ui/StatusCircle";
 import type { LanguageCode } from "@/lib/lesson-catalog";
+
+const EXPECTATIONS = [
+  "Multiple-choice vocabulary, grammar, and reading questions.",
+  "Each round steps up a level; the test stops when a round gets hard.",
+  "No timer, no penalty for guessing — skip nothing, just answer.",
+];
 
 type IntroScreenProps = {
   language: LanguageCode;
@@ -22,27 +29,34 @@ export function IntroScreen({
 }: IntroScreenProps) {
   return (
     <div className="mx-auto max-w-xl">
-      <Heading as="h1" size="lg">
-        Find your level
-      </Heading>
-      <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
-        A short placement test that adapts round by round. Most sessions take
-        5–10 minutes; it ends early once it finds your edge.
-      </p>
+      <PageHeader
+        kicker="Placement"
+        title="Find your level"
+        description="A short placement test that adapts round by round. Most sessions take 5–10 minutes; it ends early once it finds your edge."
+      />
 
-      <div className="mt-6">
-        <LanguagePicker
-          onSelect={(option) => onLanguageChange(option.code)}
-          value={language}
-        />
-      </div>
+      <LanguagePicker
+        onSelect={(option) => onLanguageChange(option.code)}
+        value={language}
+      />
 
       <Card className="mt-6" elevation="card">
         <p className="text-[13.5px] font-semibold">What to expect</p>
-        <ul className="mt-2 grid gap-1.5 text-[13px] leading-relaxed text-ink-2">
-          <li>· Multiple-choice vocabulary, grammar, and reading questions.</li>
-          <li>· Each round steps up a level; the test stops when a round gets hard.</li>
-          <li>· No timer, no penalty for guessing — skip nothing, just answer.</li>
+        <ul className="mt-3 grid gap-2.5">
+          {EXPECTATIONS.map((text, index) => (
+            <li
+              className="flex items-start gap-3 text-[13px] leading-relaxed text-ink-2"
+              key={text}
+            >
+              <StatusCircle
+                className="mt-px font-mono text-[11px] font-[560]"
+                tone="accent"
+              >
+                {index + 1}
+              </StatusCircle>
+              <span>{text}</span>
+            </li>
+          ))}
         </ul>
       </Card>
 

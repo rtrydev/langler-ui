@@ -15,7 +15,7 @@ export function TokenReveal({
   return (
     <section
       aria-labelledby="token-created-title"
-      className="rounded-xl border border-line bg-surface p-5 shadow-floating sm:p-7"
+      className="rounded-lg border border-line border-t-[3px] border-t-accent bg-surface p-5 shadow-raised"
     >
       <Heading as="h2" id="token-created-title" size="sm">
         Token created
@@ -23,7 +23,7 @@ export function TokenReveal({
       <p className="mt-1 text-[13px] text-ink-2">
         Copy it now — Langler doesn&apos;t store the secret.
       </p>
-      <div className="mt-5 flex flex-col gap-3 rounded-[9px] border border-line bg-paper p-3 sm:flex-row sm:items-center">
+      <div className="mt-5 flex flex-col gap-3 rounded-md border border-line bg-surface-2 p-3 sm:flex-row sm:items-center">
         <code className="min-w-0 flex-1 break-all font-mono text-[13px] text-ink">
           {secret}
         </code>
@@ -32,7 +32,7 @@ export function TokenReveal({
       <Callout className="mt-3" tone="warning">
         You won&apos;t see this token again. Store it somewhere safe.
       </Callout>
-      <Button className="mt-5" fullWidth onClick={onDismiss} variant="contrast">
+      <Button className="mt-5" fullWidth onClick={onDismiss} variant="secondary">
         I&apos;ve saved it
       </Button>
     </section>

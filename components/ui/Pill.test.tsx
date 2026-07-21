@@ -28,7 +28,7 @@ describe("Pill", () => {
       </Pill>,
     );
     const el = screen.getByRole("button");
-    expect(el.className).toContain("bg-crimson");
-    expect(el.className).toContain("text-on-accent");
+    expect(el.className).toContain("bg-crimson-soft");
+    expect(el.className).toContain("text-crimson");
   });
 });

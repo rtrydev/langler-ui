@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 import {
   reviewGradeSchema,
@@ -92,9 +94,7 @@ export async function getProgressSummary(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/progress?date=${studyDate()}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/progress?date=${studyDate()}`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }
@@ -116,9 +116,7 @@ export async function getDueReviews(
   const query = new URLSearchParams({ date: studyDate() });
   if (language) query.set("language", language);
   try {
-    const response = await fetch(`${apiUrl}/reviews/due?${query}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/reviews/due?${query}`);
     if (!response.ok) {
       return { ok: false, error: await responseError(response) };
     }
@@ -145,10 +143,9 @@ export async function gradeReview(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/reviews/grade`, {
+    const response = await authorizedFetch(session, `${apiUrl}/reviews/grade`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ ...parsed.data, reviewedOn: studyDate() }),

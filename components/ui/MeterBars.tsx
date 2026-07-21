@@ -25,8 +25,8 @@ export function MeterBars({
         <span
           key={i}
           className={cn(
-            "h-[5px] w-5 rounded-[2px]",
-            i < value ? "bg-accent" : "bg-line",
+            "h-1.5 w-5 rounded-[2px]",
+            i < value ? "bg-accent" : "bg-tint",
           )}
         />
       ))}

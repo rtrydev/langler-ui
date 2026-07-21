@@ -17,7 +17,7 @@ export function SearchInput({
       <svg
         aria-hidden
         viewBox="0 0 24 24"
-        className="pointer-events-none absolute top-1/2 left-3 size-[15px] -translate-y-1/2 text-ink-3"
+        className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-3"
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"
@@ -27,7 +27,7 @@ export function SearchInput({
       </svg>
       <Input
         type="search"
-        className={cn("pl-9 text-[13px]", inputClassName)}
+        className={cn("pl-[38px] text-[13px]", inputClassName)}
         {...props}
       />
     </div>

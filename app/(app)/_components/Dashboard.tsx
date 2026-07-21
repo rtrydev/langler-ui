@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
+import { PageHeader } from "@/components/PageHeader";
 import { useSession } from "@/components/SessionContext";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { Heading } from "@/components/ui/Heading";
 import { Overline } from "@/components/ui/Overline";
 import { StatusDot } from "@/components/ui/StatusDot";
 import { getProfileLevels, type ProfileLevel } from "@/lib/api/assessments";
@@ -61,12 +62,8 @@ export function Dashboard() {
   if (state.kind === "loading") {
     return (
       <div>
-        <Heading as="h1" size="lg">
-          Your notebook
-        </Heading>
-        <p className="mt-4 font-mono text-sm text-ink-2" role="status">
-          Checking today&apos;s study notes…
-        </p>
+        <PageHeader kicker={longDate()} title="Your notebook" />
+        <LoadingState>Checking today&apos;s study notes…</LoadingState>
       </div>
     );
   }
@@ -74,12 +71,8 @@ export function Dashboard() {
   if (state.kind === "error") {
     return (
       <div>
-        <Heading as="h1" size="lg">
-          Your notebook
-        </Heading>
-        <Callout className="mt-5" tone="error">
-          {state.message}
-        </Callout>
+        <PageHeader kicker={longDate()} title="Your notebook" />
+        <Callout tone="error">{state.message}</Callout>
       </div>
     );
   }
@@ -93,12 +86,9 @@ export function Dashboard() {
 
   return (
     <div>
-      <p className="text-xs font-medium text-ink-3">{longDate()}</p>
-      <Heading as="h1" className="mt-0.5" size="lg">
-        Your notebook
-      </Heading>
+      <PageHeader kicker={longDate()} title="Your notebook" />
 
-      <Overline as="h2" className="mt-8 mb-3">
+      <Overline as="h2" className="mb-3">
         Due today
       </Overline>
       <div className="grid gap-3 md:grid-cols-3 md:gap-4">
@@ -108,21 +98,21 @@ export function Dashboard() {
           return (
             <Card
               className="flex items-center justify-between gap-4 md:block"
-              edge={language.tone}
-              edgeSide="left"
               elevation="card"
               key={progress.language}
             >
               <div>
-                <p className="text-base font-bold text-ink md:text-xl">
+                <p className="font-display text-base font-semibold text-ink md:text-xl">
                   {language.nativeName}{" "}
-                  <span className="text-xs font-normal text-ink-3 md:block md:mt-0.5">
+                  <span className="font-sans text-xs font-normal text-ink-3 md:mt-0.5 md:block">
                     {language.englishName}
                   </span>
                 </p>
                 {progress.dueToday > 0 ? (
                   <p className="mt-1 text-[13px] text-ink-2 md:my-3">
-                    <strong className="text-ink md:text-3xl">{progress.dueToday}</strong>{" "}
+                    <strong className="font-display font-semibold text-ink md:text-3xl">
+                      {progress.dueToday}
+                    </strong>{" "}
                     items due
                   </p>
                 ) : (
@@ -143,7 +133,7 @@ export function Dashboard() {
         })}
       </div>
 
-      <Overline as="h2" className="mt-8 mb-3">
+      <Overline as="h2" className="mt-10 mb-3">
         Recent lessons
       </Overline>
       {recent.length > 0 ? (
@@ -155,8 +145,8 @@ export function Dashboard() {
                 href={`/lessons/detail/?id=${encodeURIComponent(lesson.lessonId)}`}
                 key={`${lesson.lessonId}-${lesson.completedAt}`}
               >
-                <Card className="h-full transition-colors hover:border-accent-border">
-                  <p className="text-[11px] font-semibold text-ink-3">
+                <Card className="h-full transition-all duration-150 hover:-translate-y-px hover:border-accent-border hover:shadow-raised">
+                  <p className="font-mono text-[11px] tracking-[0.04em] text-ink-3 uppercase">
                     {language?.nativeName ?? lesson.language} ·{" "}
                     {new Intl.DateTimeFormat(undefined, {
                       day: "numeric",
@@ -166,7 +156,7 @@ export function Dashboard() {
                   <p className="mt-2 text-[15px] font-semibold text-ink">
                     {lesson.title}
                   </p>
-                  <p className="mt-3 text-sm font-bold text-accent">
+                  <p className="mt-3 font-display text-lg font-semibold text-accent">
                     {lessonScore(lesson.score, lesson.maxScore)}
                   </p>
                 </Card>
@@ -175,21 +165,19 @@ export function Dashboard() {
           })}
         </div>
       ) : (
-        <Card dashed>
-          <EmptyState
-            description="Open a lesson when you're ready to study."
-            title="Your first result will appear here"
-          >
-            <Link href="/lessons/">
-              <Button size="sm" variant="accent">
-                Browse lessons
-              </Button>
-            </Link>
-          </EmptyState>
-        </Card>
+        <EmptyState
+          description="Open a lesson when you're ready to study."
+          title="Your first result will appear here"
+        >
+          <Link href="/lessons/">
+            <Button size="sm" variant="accent">
+              Browse lessons
+            </Button>
+          </Link>
+        </EmptyState>
       )}
 
-      <Overline as="h2" className="mt-8 mb-3">
+      <Overline as="h2" className="mt-10 mb-3">
         Per-language snapshot
       </Overline>
       <div className="grid gap-3 md:grid-cols-3 md:gap-4">
@@ -200,24 +188,24 @@ export function Dashboard() {
             (level) => level.language === progress.language,
           );
           return (
-            <Card key={progress.language}>
-              <p className="text-sm font-bold text-ink">
+            <Card className="flex h-full flex-col" key={progress.language}>
+              <p className="flex items-center text-sm font-semibold text-ink">
                 <StatusDot className="mr-2" tone={language.tone} />
                 {language.nativeName}
               </p>
               {estimate ? (
-                <p className="mt-2 text-[13px] text-ink-2">
-                  <strong className="text-ink">
-                    {levelLabel(progress.language, estimate.level)}
-                  </strong>{" "}
-                  <span className="text-[11px] text-ink-3">
+                <div className="mt-2">
+                  <span className="font-display text-2xl font-semibold text-ink">
+                    ≈ {levelLabel(progress.language, estimate.level)}
+                  </span>
+                  <span className="mt-0.5 block font-mono text-[11px] text-ink-3">
                     estimated · placement{" "}
                     {new Intl.DateTimeFormat(undefined, {
                       day: "numeric",
                       month: "short",
                     }).format(new Date(estimate.updatedAt))}
                   </span>
-                </p>
+                </div>
               ) : (
                 <p className="mt-2 text-[13px] text-ink-2">
                   No estimate yet ·{" "}
@@ -229,18 +217,30 @@ export function Dashboard() {
                   </Link>
                 </p>
               )}
-              <div className="mt-4 flex gap-6 border-t border-line-2 pt-3">
+              <div className="mt-auto flex gap-6 border-t border-line pt-3">
                 <div>
-                  <p className="text-base font-bold">{progress.lessonsCompleted}</p>
-                  <p className="text-[10.5px] text-ink-3">lessons</p>
+                  <p className="font-display text-lg font-semibold">
+                    {progress.lessonsCompleted}
+                  </p>
+                  <p className="font-mono text-[10px] tracking-[0.1em] text-ink-3 uppercase">
+                    lessons
+                  </p>
                 </div>
                 <div>
-                  <p className="text-base font-bold">{progress.itemsTracked}</p>
-                  <p className="text-[10.5px] text-ink-3">items</p>
+                  <p className="font-display text-lg font-semibold">
+                    {progress.itemsTracked}
+                  </p>
+                  <p className="font-mono text-[10px] tracking-[0.1em] text-ink-3 uppercase">
+                    items
+                  </p>
                 </div>
                 <div>
-                  <p className="text-base font-bold">{progress.currentReviewStreak}</p>
-                  <p className="text-[10.5px] text-ink-3">review days</p>
+                  <p className="font-display text-lg font-semibold">
+                    {progress.currentReviewStreak}
+                  </p>
+                  <p className="font-mono text-[10px] tracking-[0.1em] text-ink-3 uppercase">
+                    review days
+                  </p>
                 </div>
               </div>
             </Card>

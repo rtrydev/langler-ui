@@ -13,7 +13,7 @@ describe("Textarea", () => {
   it("marks invalid state", () => {
     render(<Textarea placeholder="Paste JSON" invalid />);
     const el = screen.getByPlaceholderText("Paste JSON");
-    expect(el.className).toContain("border-crimson");
+    expect(el.className).toContain("border-vermilion");
     expect(el.getAttribute("aria-invalid")).toBe("true");
   });
 });

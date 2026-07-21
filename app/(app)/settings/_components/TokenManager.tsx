@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
+import { useSession } from "@/components/SessionContext";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
-import { useSession } from "@/components/SessionContext";
+import { Overline } from "@/components/ui/Overline";
 import {
   createAgentToken,
   listAgentTokens,
@@ -73,19 +75,19 @@ export function TokenManager() {
   }
 
   return (
-    <div className="grid gap-6">
+    <section className="grid gap-5">
+      <div>
+        <Overline as="h2">Agent tokens</Overline>
+        <p className="mt-1.5 text-[13px] text-ink-2">
+          Secrets are hashed and shown only when created.
+        </p>
+      </div>
       {secret ? <TokenReveal onDismiss={() => setSecret(undefined)} secret={secret} /> : null}
       {error ? <Callout tone="error">{error}</Callout> : null}
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
         <Card padding="none">
-          <div className="border-b border-line-2 px-5 py-4">
-            <Heading as="h2" size="sm">Agent tokens</Heading>
-            <p className="mt-1 text-xs text-ink-2">
-              Secrets are hashed and shown only when created.
-            </p>
-          </div>
           {loading ? (
-            <p className="px-5 py-8 text-center text-sm text-ink-2">Loading tokens…</p>
+            <LoadingState className="p-5">Loading tokens…</LoadingState>
           ) : (
             <TokenList onRevoke={revoke} revoking={revoking} tokens={tokens} />
           )}
@@ -95,6 +97,6 @@ export function TokenManager() {
           <TokenCreateForm busy={creating} error={creating ? error : undefined} onCreate={create} />
         </Card>
       </div>
-    </div>
+    </section>
   );
 }

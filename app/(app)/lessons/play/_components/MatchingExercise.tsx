@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { OptionCard } from "@/components/ui/OptionCard";
+import { cn } from "@/lib/cn";
 import { gradeMatching, seededShuffle } from "@/lib/lesson-grading";
 import type { ExercisePlayerProps } from "./types";
 
@@ -33,10 +34,10 @@ export function MatchingExercise({ exercise, onComplete }: ExercisePlayerProps) 
       <p className="text-sm text-ink-2">{exercise.prompt || "Match each item with its meaning."}</p>
       <div className="mt-6 grid grid-cols-2 gap-4">
         <div className="grid content-start gap-2">
-          {pairs.map((pair) => <OptionCard className="font-jp text-base" disabled={checked} key={pair.left} onClick={() => setSelected(pair.left)} selected={selected === pair.left}>{pair.left}<span className="mt-1 block text-xs text-ink-3">{matches[pair.left] ?? "Choose a match"}</span></OptionCard>)}
+          {pairs.map((pair) => <OptionCard className={cn("font-jp text-base", matches[pair.left] && "!border-success-border !bg-success-soft")} disabled={checked} key={pair.left} onClick={() => setSelected(pair.left)} selected={selected === pair.left}>{pair.left}<span className="mt-1 block text-xs text-ink-3">{matches[pair.left] ?? "Choose a match"}</span></OptionCard>)}
         </div>
         <div className="grid content-start gap-2">
-          {rightItems.map((right) => <OptionCard disabled={checked || !selected} key={right} onClick={() => assign(right)} selected={Object.values(matches).includes(right)}>{right}</OptionCard>)}
+          {rightItems.map((right) => <OptionCard className={cn(Object.values(matches).includes(right) && "!border-success-border !bg-success-soft !shadow-card")} disabled={checked || !selected} key={right} onClick={() => assign(right)} selected={Object.values(matches).includes(right)}>{right}</OptionCard>)}
         </div>
       </div>
       {checked ? (
@@ -48,7 +49,7 @@ export function MatchingExercise({ exercise, onComplete }: ExercisePlayerProps) 
         </Callout>
       ) : null}
       <div className="mt-7 flex justify-end">
-        {checked ? <Button onClick={() => onComplete(outcome)}>Next →</Button> : <Button disabled={Object.keys(matches).length !== pairs.length} onClick={() => setChecked(true)}>Check</Button>}
+        {checked ? <Button onClick={() => onComplete(outcome)} size="lg">Next →</Button> : <Button disabled={Object.keys(matches).length !== pairs.length} onClick={() => setChecked(true)} size="lg">Check</Button>}
       </div>
     </div>
   );

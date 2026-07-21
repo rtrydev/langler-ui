@@ -15,7 +15,7 @@ describe("Input", () => {
   it("marks invalid fields for styling and assistive tech", () => {
     render(<Input placeholder="Email" invalid />);
     const el = screen.getByPlaceholderText("Email");
-    expect(el.className).toContain("border-crimson");
+    expect(el.className).toContain("border-vermilion");
     expect(el.getAttribute("aria-invalid")).toBe("true");
   });
 

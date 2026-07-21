@@ -48,18 +48,12 @@ export function ImportStep({ onBack }: { onBack: () => void }) {
   if (state.status === "imported") {
     const { lesson } = state;
     return (
-      <Card className="text-center" elevation="card" padding="lg">
-        <span
-          aria-hidden
-          className="mx-auto mb-3.5 grid size-11 place-items-center rounded-full bg-success-soft text-xl text-success"
-        >
-          ✓
-        </span>
-        <p className="mb-1.5 text-lg font-bold">
+      <Callout tone="success">
+        <p className="text-base font-bold text-ink">
           {lesson.created ? "Lesson imported" : "Lesson already in your library"}
         </p>
-        <p className="text-[13.5px] font-semibold text-ink-2">{lesson.title}</p>
-        <p className="mt-1 text-[12.5px] text-ink-3">
+        <p className="mt-1 text-sm font-semibold text-ink-2">{lesson.title}</p>
+        <p className="mt-1 text-xs text-ink-3">
           {lesson.exerciseCount}{" "}
           {lesson.exerciseCount === 1 ? "exercise" : "exercises"} ·{" "}
           {lesson.totalPoints} points
@@ -67,7 +61,7 @@ export function ImportStep({ onBack }: { onBack: () => void }) {
             ? ` · ${lesson.vocabRefCount} vocab items`
             : ""}
         </p>
-        <div className="mt-5 flex justify-center gap-3">
+        <div className="mt-5 flex gap-3">
           <Button
             onClick={() => {
               setPasted("");
@@ -81,44 +75,48 @@ export function ImportStep({ onBack }: { onBack: () => void }) {
             <Button>Open lesson</Button>
           </Link>
         </div>
-      </Card>
+      </Callout>
     );
   }
 
   return (
-    <div className="grid gap-4">
-      {state.status === "invalid" ? (
-        <>
-          <ValidationReport issues={state.issues} />
-          <p className="text-[13px] leading-relaxed text-ink-2">
-            Paste the errors back to your AI, then paste its corrected JSON
-            below and validate again.
-          </p>
-        </>
-      ) : (
-        <p className="text-sm text-ink-2">Paste the JSON your AI produced.</p>
-      )}
+    <div className="grid gap-6">
+      <Card elevation="card">
+        <div className="grid gap-4">
+          {state.status === "invalid" ? (
+            <>
+              <ValidationReport issues={state.issues} />
+              <p className="text-[13px] leading-relaxed text-ink-2">
+                Paste the errors back to your AI, then paste its corrected JSON
+                below and validate again.
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-ink-2">Paste the JSON your AI produced.</p>
+          )}
 
-      {state.status === "failed" ? (
-        <Callout tone="error">{state.message}</Callout>
-      ) : null}
+          {state.status === "failed" ? (
+            <Callout tone="error">{state.message}</Callout>
+          ) : null}
 
-      <div>
-        <Label className="sr-only" htmlFor="lesson-json">
-          Lesson JSON
-        </Label>
-        <Textarea
-          className="min-h-60 font-mono text-xs leading-relaxed"
-          id="lesson-json"
-          invalid={state.status === "invalid"}
-          onChange={(event) => setPasted(event.target.value)}
-          placeholder={'{"schemaVersion": "1.0", "lessonId": "…", …}'}
-          value={pasted}
-        />
-      </div>
+          <div>
+            <Label className="sr-only" htmlFor="lesson-json">
+              Lesson JSON
+            </Label>
+            <Textarea
+              className="min-h-60 font-mono text-xs leading-relaxed"
+              id="lesson-json"
+              invalid={state.status === "invalid"}
+              onChange={(event) => setPasted(event.target.value)}
+              placeholder={'{"schemaVersion": "1.0", "lessonId": "…", …}'}
+              value={pasted}
+            />
+          </div>
+        </div>
+      </Card>
 
       <div className="flex justify-between">
-        <Button onClick={onBack} variant="secondary">
+        <Button onClick={onBack} variant="ghost">
           ← Back
         </Button>
         <Button

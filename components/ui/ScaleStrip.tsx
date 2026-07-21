@@ -13,13 +13,13 @@ export type ScaleStripProps = Omit<ComponentProps<"div">, "children"> & {
 
 export function ScaleStrip({ items, className, ...props }: ScaleStripProps) {
   return (
-    <div className={cn("flex gap-[5px]", className)} {...props}>
+    <div className={cn("flex gap-1", className)} {...props}>
       {items.map((item) => (
         <span
           className={cn(
-            "flex-1 rounded-[5px] border py-1.5 text-center text-[11px] font-semibold",
+            "flex-1 rounded-md border py-1.5 text-center font-mono text-[11px] font-[560]",
             item.active
-              ? "border-accent bg-accent-soft text-accent"
+              ? "border-accent-strong bg-accent bg-[linear-gradient(180deg,var(--accent-hi),var(--accent))] text-on-accent shadow-btn"
               : "border-line text-ink-3",
             item.struck && !item.active && "line-through opacity-70",
           )}

@@ -9,7 +9,7 @@ describe("AuthBrand", () => {
     expect(container.querySelector("img")?.getAttribute("src")).toContain(
       "langler-mark.png",
     );
-    expect(screen.getByText("Langler").className).toContain("font-bold");
+    expect(screen.getByText("Langler").className).toContain("font-display");
     expect(
       screen.getByText("Your languages. Your AI. One notebook."),
     ).toBeTruthy();

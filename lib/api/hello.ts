@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 
 export type HelloResponse = {
@@ -34,9 +36,7 @@ export async function getHello(
   }
 
   try {
-    const response = await fetch(`${apiUrl}/hello`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/hello`);
 
     if (!response.ok) {
       return {

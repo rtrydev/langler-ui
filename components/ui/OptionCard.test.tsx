@@ -12,11 +12,11 @@ describe("OptionCard", () => {
     expect(el.getAttribute("aria-pressed")).toBe("true");
   });
 
-  it("highlights the selected card with the accent ring", () => {
+  it("highlights the selected card with the accent border", () => {
     render(<OptionCard selected>抹茶</OptionCard>);
     const el = screen.getByRole("button");
     expect(el.className).toContain("border-accent");
-    expect(el.className).toContain("ring-accent-soft");
+    expect(el.className).toContain("var(--accent)");
   });
 
   it("renders unselected with a hairline border", () => {

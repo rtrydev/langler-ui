@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
 import { useSession } from "@/components/SessionContext";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
@@ -29,14 +30,14 @@ export function PrintableWorksheet() {
   }, [lessonId, session]);
 
   if (!lessonId) return <Callout tone="error">No lesson selected.</Callout>;
-  if (state.kind === "loading") return <p role="status">Preparing worksheet…</p>;
+  if (state.kind === "loading") return <LoadingState>Preparing worksheet…</LoadingState>;
   if (state.kind === "error") return <Callout tone="error">{state.message}</Callout>;
   const language = languageOption(state.lesson.language);
 
   return (
     <div className="print-workspace">
-      <div className="print-toolbar mb-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-surface p-4">
-        <Link href={`/lessons/detail/?id=${state.lesson.lessonId}`}><Button variant="secondary">← Lesson</Button></Link>
+      <div className="print-toolbar mb-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-line bg-surface p-4 shadow-card">
+        <Link href={`/lessons/detail/?id=${state.lesson.lessonId}`}><Button variant="ghost">← Lesson</Button></Link>
         <div className="flex items-center gap-4"><Switch checked={includeAnswers} onChange={(event) => setIncludeAnswers(event.target.checked)}>Include answer key</Switch><Button onClick={() => window.print()}>Print worksheet</Button></div>
       </div>
       <article className="worksheet-page" lang={state.lesson.language}>

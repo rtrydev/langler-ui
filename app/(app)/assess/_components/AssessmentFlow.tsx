@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
+import { SessionChrome } from "@/components/SessionChrome";
 import { useSession } from "@/components/SessionContext";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
-import { Card } from "@/components/ui/Card";
 import { OptionCard } from "@/components/ui/OptionCard";
+import { Overline } from "@/components/ui/Overline";
 import { StepProgress } from "@/components/ui/StepProgress";
 import {
   getAssessment,
@@ -110,11 +112,11 @@ export function AssessmentFlow() {
 
   if (state.kind === "resuming" || state.kind === "starting") {
     return (
-      <p className="font-mono text-sm text-ink-2" role="status">
+      <LoadingState>
         {state.kind === "starting"
           ? "Assembling your first questions…"
           : "Picking up where you left off…"}
-      </p>
+      </LoadingState>
     );
   }
 
@@ -156,37 +158,35 @@ export function AssessmentFlow() {
   const option = languageOption(state.view.language);
 
   return (
-    <Card className="mx-auto flex min-h-[31rem] max-w-[620px] flex-col overflow-hidden" padding="none">
-      <div className="flex h-[52px] items-center gap-4 border-b border-line px-5">
-        <Link aria-label="Exit placement test" className="text-xl text-ink-2 hover:text-ink" href="/">
-          ×
-        </Link>
-        <Badge tone="accent">{option?.nativeName ?? state.view.language}</Badge>
-        <span className="text-xs text-ink-3">
-          Round {stage.index + 1} · {levelLabel(state.view.language, stage.band)}
-        </span>
-        <span className="ml-auto text-xs text-ink-3">
-          {state.answers.length + 1} / {stage.items.length}
-        </span>
-      </div>
-      <StepProgress
-        className="mx-5 mt-4"
-        completed={state.answers.length}
-        total={stage.items.length}
-      />
-
+    <SessionChrome
+      exitHref="/"
+      exitLabel="Exit placement test"
+      badge={<Badge tone={option?.tone}>{option?.nativeName ?? state.view.language}</Badge>}
+      progress={
+        <StepProgress
+          className="w-full"
+          completed={state.answers.length}
+          total={stage.items.length}
+        />
+      }
+      counter={`${state.answers.length + 1} / ${stage.items.length}`}
+      bodyClassName="px-6 py-8"
+    >
       {state.submitting || !item ? (
-        <p className="flex flex-1 items-center justify-center font-mono text-sm text-ink-2" role="status">
-          Checking this round…
-        </p>
+        <div className="flex flex-1 items-center justify-center">
+          <LoadingState>Checking this round…</LoadingState>
+        </div>
       ) : (
-        <div className="flex flex-1 flex-col px-6 py-8">
-          <p className="text-center text-[11px] font-semibold tracking-wide text-ink-3 uppercase">
+        <>
+          <Overline className="self-center">
             {ITEM_KIND_LABELS[item.kind] ?? item.kind}
+          </Overline>
+          <p className="mb-2 text-center font-mono text-[11px] text-ink-3">
+            Round {stage.index + 1} · {levelLabel(state.view.language, stage.band)}
           </p>
           <p
             className={cn(
-              "my-6 text-center leading-relaxed text-ink",
+              "mb-6 text-center leading-relaxed text-ink",
               option?.code === "ja" && "font-jp-serif",
               option?.code === "my" && "font-myanmar",
               item.kind === "vocab" ? "text-4xl sm:text-5xl" : "text-xl sm:text-2xl",
@@ -203,7 +203,7 @@ export function AssessmentFlow() {
           <div className="grid gap-2.5">
             {item.options.map((choice, index) => (
               <OptionCard
-                className="px-4 py-3 text-[14px]"
+                className="text-[14px]"
                 key={`${state.answers.length}-${index}`}
                 onClick={() => void answer(index)}
               >
@@ -220,8 +220,8 @@ export function AssessmentFlow() {
             No timer — answer at your own pace. Guessing is fine; it only shapes
             the estimate.
           </p>
-        </div>
+        </>
       )}
-    </Card>
+    </SessionChrome>
   );
 }

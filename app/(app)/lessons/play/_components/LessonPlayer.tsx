@@ -1,15 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { LoadingState } from "@/components/LoadingState";
+import { SessionChrome } from "@/components/SessionChrome";
 import { useSession } from "@/components/SessionContext";
+import { Badge } from "@/components/ui/Badge";
 import { Callout } from "@/components/ui/Callout";
 import { Overline } from "@/components/ui/Overline";
 import { StepProgress } from "@/components/ui/StepProgress";
 import { getLesson, saveLessonResult, type ExerciseOutcome, type LessonDetail, type LessonResultDocument } from "@/lib/api/lessons";
 import { buildLessonResult } from "@/lib/lesson-grading";
-import { exerciseTypeLabel } from "@/lib/lesson-catalog";
+import { exerciseTypeLabel, languageOption } from "@/lib/lesson-catalog";
 import { lessonResultSchema } from "@/lib/validation/result";
 import { ExerciseRenderer } from "./ExerciseRenderer";
 import { ResultSummary } from "./ResultSummary";
@@ -73,24 +75,24 @@ export function LessonPlayer() {
   }
 
   if (!lessonId) return <Callout tone="error">No lesson selected.</Callout>;
-  if (state.kind === "loading") return <p className="font-mono text-sm text-ink-2" role="status">Preparing your lesson…</p>;
+  if (state.kind === "loading") return <LoadingState>Preparing your lesson…</LoadingState>;
   if (state.kind === "error") return <Callout tone="error">{state.message}</Callout>;
   if (result) return <ResultSummary lesson={state.lesson} onRetry={retry} onRetrySave={() => void persist(result)} result={result} saveError={saveError} saving={saving} />;
 
   const exercise = state.lesson.exercises[index];
+  const language = languageOption(state.lesson.language);
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-window">
-      <header className="flex items-center gap-4 border-b border-line px-4 py-3 sm:px-6">
-        <Link aria-label="Exit lesson" className="text-2xl text-ink-2 hover:text-ink" href={`/lessons/detail/?id=${state.lesson.lessonId}`}>×</Link>
-        <p className="hidden truncate text-sm font-semibold sm:block">{state.lesson.title}</p>
-        <StepProgress className="mx-auto w-full max-w-72" completed={index + 1} total={state.lesson.exercises.length} />
-        <span className="shrink-0 text-xs text-ink-3">{index + 1} / {state.lesson.exercises.length}</span>
-      </header>
-      <main className="min-h-[28rem] p-5 sm:p-8 lg:p-10">
-        <Overline className="mb-2">{exerciseTypeLabel(exercise.type)}</Overline>
-        <ExerciseRenderer exercise={exercise} language={state.lesson.language} level={state.lesson.level} onComplete={complete} />
-      </main>
-      <footer className="border-t border-line px-5 py-3 text-xs text-ink-3 sm:px-8">Your place and answers stay here while you work through this exercise.</footer>
-    </div>
+    <SessionChrome
+      exitHref={`/lessons/detail/?id=${state.lesson.lessonId}`}
+      exitLabel="Exit lesson"
+      badge={<Badge tone={language?.tone}>{language?.nativeName ?? state.lesson.language}</Badge>}
+      progress={<StepProgress className="w-full" completed={index + 1} total={state.lesson.exercises.length} />}
+      counter={`${index + 1} / ${state.lesson.exercises.length}`}
+      bodyClassName="min-h-[28rem] sm:p-8 lg:p-10"
+      footer={<p className="text-center text-xs text-ink-3">Your place and answers stay here while you work through this exercise.</p>}
+    >
+      <Overline className="mb-2">{exerciseTypeLabel(exercise.type)}</Overline>
+      <ExerciseRenderer exercise={exercise} language={state.lesson.language} level={state.lesson.level} onComplete={complete} />
+    </SessionChrome>
   );
 }

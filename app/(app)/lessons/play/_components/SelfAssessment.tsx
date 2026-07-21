@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { OptionCard } from "@/components/ui/OptionCard";
 
 export function SelfAssessment({
   rating,
@@ -10,23 +12,23 @@ export function SelfAssessment({
   onContinue: () => void;
 }) {
   return (
-    <div className="mt-6 rounded-xl border border-line bg-paper p-4">
+    <Card className="mt-6 bg-surface-2" elevation="flat">
       <p className="text-sm font-semibold">How did that feel?</p>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {["Not yet", "With help", "Mostly", "Confident"].map((label, index) => (
-          <Button
-            aria-pressed={rating === index + 1}
+          <OptionCard
+            className="py-3 text-center text-sm font-medium"
             key={label}
             onClick={() => onChange(index + 1)}
-            variant={rating === index + 1 ? "primary" : "secondary"}
+            selected={rating === index + 1}
           >
             {label}
-          </Button>
+          </OptionCard>
         ))}
       </div>
-      <Button className="mt-4" disabled={rating === null} onClick={onContinue}>
+      <Button className="mt-4" disabled={rating === null} onClick={onContinue} size="lg">
         Continue →
       </Button>
-    </div>
+    </Card>
   );
 }

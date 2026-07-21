@@ -15,16 +15,16 @@ export function Disclosure({
     <details className={cn("group", className)} {...props}>
       <summary
         className={cn(
-          "inline-flex cursor-pointer list-none items-center gap-1.5 rounded-[5px] text-xs font-semibold text-accent",
-          "hover:text-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+          "inline-flex cursor-pointer list-none items-center gap-1.5 rounded-md px-2 py-1.5 text-[13px] font-[540] text-ink-2 transition-colors",
+          "hover:bg-tint hover:text-ink focus-visible:shadow-ring focus-visible:outline-none",
           "[&::-webkit-details-marker]:hidden",
         )}
       >
         <span
           aria-hidden
-          className="transition-transform group-open:rotate-90"
+          className="font-mono text-ink-3 transition-transform group-open:rotate-180"
         >
-          ›
+          ▾
         </span>
         {summary}
       </summary>

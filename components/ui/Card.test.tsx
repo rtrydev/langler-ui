@@ -35,11 +35,10 @@ describe("Card", () => {
     expect(screen.getByText("Body").className).toContain("border-l-gold");
   });
 
-  it("switches to the accent-tinted dashed style", () => {
+  it("switches to the hairline dashed style", () => {
     render(<Card dashed>CTA</Card>);
     const el = screen.getByText("CTA");
     expect(el.className).toContain("border-dashed");
-    expect(el.className).toContain("bg-accent-soft");
     expect(el.className).not.toContain("bg-surface");
   });
 });

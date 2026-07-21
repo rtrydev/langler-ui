@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Overline } from "@/components/ui/Overline";
 import { Textarea } from "@/components/ui/Textarea";
 import { selfOutcome } from "@/lib/lesson-grading";
 import { SelfAssessment } from "./SelfAssessment";
@@ -19,11 +20,11 @@ export function TranslationExercise({ exercise, onComplete }: ExercisePlayerProp
       <p className="mt-6 font-jp-serif text-2xl leading-loose">{exercise.payload?.source}</p>
       <Textarea className="mt-5 min-h-32" onChange={(event) => setResponse(event.target.value)} placeholder="Write your translation…" value={response} />
       {!revealed ? (
-        <Button className="mt-4" disabled={!response.trim()} onClick={() => setRevealed(true)}>Compare answer</Button>
+        <Button className="mt-4" disabled={!response.trim()} onClick={() => setRevealed(true)} size="lg">Compare answer</Button>
       ) : (
         <>
-          <Card className="mt-5" elevation="flat">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-3">Reference answer</p>
+          <Card className="mt-5 bg-surface-2" elevation="flat">
+            <Overline>Reference answer</Overline>
             <p className="mt-2 leading-relaxed">{exercise.payload?.reference || "No reference answer was provided. Assess whether your meaning is clear and accurate."}</p>
           </Card>
           <SelfAssessment rating={rating} onChange={setRating} onContinue={() => rating !== null && onComplete(selfOutcome(exercise, rating))} />

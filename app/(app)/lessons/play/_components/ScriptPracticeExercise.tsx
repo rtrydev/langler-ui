@@ -5,6 +5,7 @@ import { useSession } from "@/components/SessionContext";
 import { Button } from "@/components/ui/Button";
 import { DrawingPad } from "@/components/ui/DrawingPad";
 import { GlyphTile } from "@/components/ui/GlyphTile";
+import { Overline } from "@/components/ui/Overline";
 import { Switch } from "@/components/ui/Switch";
 import { kanjiVGReference, listScriptGlyphs, strokeAssetUrl, type ScriptGlyph } from "@/lib/api/reference";
 import { selfOutcome } from "@/lib/lesson-grading";
@@ -53,10 +54,10 @@ export function ScriptPracticeExercise({
         </div>
         <div>
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-ink-3">{language === "my" ? "Burmese writing practice" : "KanjiVG stroke order"}</p>
+            <Overline>{language === "my" ? "Burmese writing practice" : "KanjiVG stroke order"}</Overline>
             <Switch checked={showGuide} onChange={(event) => setShowGuide(event.target.checked)}>{language === "my" ? "Romanization & guide" : "Trace guide"}</Switch>
           </div>
-          {language === "ja" ? assetUrl ? <object aria-label={`Stroke order for ${item.glyph}`} className="mt-3 h-36 w-36 rounded-lg border border-line bg-surface p-2" data={assetUrl} type="image/svg+xml" /> : <div className="mt-3 flex h-24 items-center text-xs text-ink-3">Stroke-order reference appears when the asset CDN is configured.</div> : null}
+          {language === "ja" ? assetUrl ? <object aria-label={`Stroke order for ${item.glyph}`} className="mt-3 h-36 w-36 rounded-lg border border-line bg-surface p-2 shadow-card" data={assetUrl} type="image/svg+xml" /> : <div className="mt-3 flex h-24 items-center text-xs text-ink-3">Stroke-order reference appears when the asset CDN is configured.</div> : null}
           <div className="mt-4 grid max-w-lg grid-cols-2 gap-3"><DrawingPad clearSignal={clearSignal} guide={showGuide ? item.glyph : undefined} onDraw={() => setDrawn(true)} /><DrawingPad clearSignal={clearSignal} onDraw={() => setDrawn(true)} /></div>
           <Button className="mt-3" onClick={() => { setClearSignal(clearSignal + 1); setDrawn(false); }} variant="secondary">Clear</Button>
         </div>

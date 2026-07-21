@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
 import { Heading } from "@/components/ui/Heading";
+import { Overline } from "@/components/ui/Overline";
+import { Progress } from "@/components/ui/Progress";
 import { StatusCircle } from "@/components/ui/StatusCircle";
 import type { LessonDetail, LessonResultDocument } from "@/lib/api/lessons";
 import { exerciseTypeLabel, languageOption } from "@/lib/lesson-catalog";
@@ -31,8 +33,9 @@ export function ResultSummary({
         <Badge tone={language?.tone ?? "neutral"}>{language?.nativeName ?? lesson.language} · {lesson.level}</Badge>
         <p className="mt-4 text-sm text-ink-3">Lesson complete</p>
         <Heading as="h1" className="mt-1" size="lg">{lesson.title}</Heading>
-        <p className="mt-6 text-6xl font-bold text-success">{percentage}<span className="text-3xl">%</span></p>
+        <p className="mt-6 font-display text-7xl font-bold tracking-[-0.03em] text-success">{percentage}<span className="text-3xl">%</span></p>
         <p className="mt-1 text-xs text-ink-3">{result.score} / {result.maxScore} points</p>
+        <Progress className="mx-auto mt-5 h-2.5 max-w-xs" value={percentage} />
       </div>
       <Card className="mt-8" padding="none">
         {result.exercises.map((outcome, index) => (
@@ -43,15 +46,21 @@ export function ResultSummary({
           </div>
         ))}
       </Card>
-      <div className="mt-5 grid grid-cols-2 gap-3 rounded-xl bg-paper p-4 text-sm sm:flex sm:justify-center sm:gap-8">
-        <p><span className="text-ink-3">Auto-graded</span><strong className="ml-2">{result.autoScore} / {result.autoMax}</strong></p>
-        <p><span className="text-ink-3">Self-assessed</span><strong className="ml-2">{result.selfScore} / {result.selfMax}</strong></p>
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <Card className="bg-surface-2 text-center" elevation="flat">
+          <Overline>Auto-graded</Overline>
+          <p className="mt-1 font-display text-xl font-semibold">{result.autoScore} / {result.autoMax}</p>
+        </Card>
+        <Card className="bg-surface-2 text-center" elevation="flat">
+          <Overline>Self-assessed</Overline>
+          <p className="mt-1 font-display text-xl font-semibold">{result.selfScore} / {result.selfMax}</p>
+        </Card>
       </div>
       {saving ? <Callout className="mt-5" tone="info">Saving your result…</Callout> : saveError ? <Callout className="mt-5" tone="error">{saveError} <Button className="ml-2" onClick={onRetrySave} size="sm" variant="secondary">Retry save</Button></Callout> : <Callout className="mt-5" tone="success">Your result was saved.</Callout>}
       <div className="mt-7 flex flex-wrap justify-center gap-2">
-        <Link href="/lessons/"><Button variant="secondary">Back to library</Button></Link>
-        <Link href={`/lessons/print/?id=${lesson.lessonId}`}><Button variant="secondary">Print worksheet</Button></Link>
-        <Button disabled={saving} onClick={onRetry}>Retry lesson</Button>
+        <Link href="/lessons/"><Button size="lg" variant="secondary">Back to library</Button></Link>
+        <Link href={`/lessons/print/?id=${lesson.lessonId}`}><Button size="lg" variant="secondary">Print worksheet</Button></Link>
+        <Button disabled={saving} onClick={onRetry} size="lg">Retry lesson</Button>
       </div>
     </div>
   );

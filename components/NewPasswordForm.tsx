@@ -7,6 +7,7 @@ import { FieldMessage } from "@/components/ui/FieldMessage";
 import { Heading } from "@/components/ui/Heading";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
+import { StatusDot } from "@/components/ui/StatusDot";
 import {
   completeNewPassword,
   type AuthSession,
@@ -111,10 +112,10 @@ export function NewPasswordForm({
       <div className="my-4 grid gap-1" id="password-requirements">
         {requirements.map((requirement) => (
           <p
-            className={`text-xs ${requirement.met ? "text-success" : "text-ink-3"}`}
+            className={`flex items-center gap-2 text-xs ${requirement.met ? "text-success" : "text-ink-3"}`}
             key={requirement.label}
           >
-            <span aria-hidden>{requirement.met ? "✓" : "○"}</span>{" "}
+            <StatusDot tone={requirement.met ? "success" : "neutral"} />
             {requirement.label}
           </p>
         ))}

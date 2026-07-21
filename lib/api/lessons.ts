@@ -1,5 +1,7 @@
 import "client-only";
 
+import { authorizedFetch } from "@/lib/api/authorized-fetch";
+
 import type { AuthSession } from "@/lib/auth/cognito";
 import { studyDate } from "@/lib/study-date";
 
@@ -228,10 +230,9 @@ export async function generateLessonPrompt(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/lessons/prompt`, {
+    const response = await authorizedFetch(session, `${apiUrl}/lessons/prompt`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(request),
@@ -257,9 +258,7 @@ export async function listLessonTopics(
   }
   try {
     const query = new URLSearchParams({ lang: language, level });
-    const response = await fetch(`${apiUrl}/lessons/topics?${query}`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/lessons/topics?${query}`);
     if (!response.ok) {
       return { ok: false, error: (await responseError(response)).error };
     }
@@ -283,10 +282,9 @@ export async function importLesson(
 		typeof document.lessonId === "string"
 			? `lesson-${document.lessonId}`
 			: `lesson-${crypto.randomUUID()}`;
-    const response = await fetch(`${apiUrl}/lessons/import`, {
+    const response = await authorizedFetch(session, `${apiUrl}/lessons/import`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${session.accessToken}`,
         "Content-Type": "application/json",
 		"Idempotency-Key": idempotencyKey,
       },
@@ -307,9 +305,7 @@ export async function listLessons(session: AuthSession): Promise<ListResult> {
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(`${apiUrl}/lessons`, {
-      headers: { Authorization: `Bearer ${session.accessToken}` },
-    });
+    const response = await authorizedFetch(session, `${apiUrl}/lessons`);
     if (!response.ok) {
       return { ok: false, error: (await responseError(response)).error };
     }
@@ -332,9 +328,8 @@ export async function getLesson(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/lessons/${encodeURIComponent(lessonId)}`,
-      { headers: { Authorization: `Bearer ${session.accessToken}` } },
     );
     if (!response.ok) {
       return { ok: false, error: (await responseError(response)).error };
@@ -354,12 +349,9 @@ export async function deleteLesson(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/lessons/${encodeURIComponent(lessonId)}`,
-      {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${session.accessToken}` },
-      },
+    { method: "DELETE" },
     );
     if (!response.ok) {
       return { ok: false, error: (await responseError(response)).error };
@@ -380,12 +372,11 @@ export async function saveLessonResult(
     return { ok: false, error: missingConfig };
   }
   try {
-    const response = await fetch(
+    const response = await authorizedFetch(session, 
       `${apiUrl}/lessons/${encodeURIComponent(lessonId)}/results`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${session.accessToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({

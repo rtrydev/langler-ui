@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Callout } from "@/components/ui/Callout";
 import { Card } from "@/components/ui/Card";
+import { MeterBars } from "@/components/ui/MeterBars";
+import { Overline } from "@/components/ui/Overline";
 import { ScaleStrip } from "@/components/ui/ScaleStrip";
 import type { AssessmentView } from "@/lib/api/assessments";
 import { languageOption, levelDescriptor, levelLabel } from "@/lib/lesson-catalog";
@@ -28,21 +30,22 @@ export function ResultScreen({ view, onRetake }: ResultScreenProps) {
 
   return (
     <Card className="mx-auto max-w-[620px] text-center" padding="lg">
-      <p className="text-[11px] font-semibold tracking-wide text-ink-3 uppercase">
-        Placement complete · {option.englishName}
-      </p>
+      <Overline>Placement complete · {option.englishName}</Overline>
       <p className="mt-6 text-sm text-ink-2">
         {result.floor ? "Start from the beginning at" : "Your estimated level is"}
       </p>
-      <p className="mt-2 text-4xl font-bold text-ink sm:text-5xl">
-        ≈ {levelLabel(view.language, result.estimatedLevel)}
+      <p className="mt-2 font-display text-5xl font-semibold tracking-[-0.02em] text-ink sm:text-6xl">
+        <span className="align-middle font-mono text-3xl font-medium text-accent sm:text-4xl">
+          ≈{" "}
+        </span>
+        {levelLabel(view.language, result.estimatedLevel)}
       </p>
       {descriptor ? (
-        <p className="mt-1.5 text-sm text-ink-2">{descriptor}</p>
+        <p className="mt-2 text-sm text-ink-2">{descriptor}</p>
       ) : null}
 
       <ScaleStrip
-        className="mx-auto mt-6 max-w-sm"
+        className="mx-auto mt-7 max-w-sm"
         items={option.levels.map((band) => {
           const outcome = tested.get(band);
           return {
@@ -52,11 +55,22 @@ export function ResultScreen({ view, onRetake }: ResultScreenProps) {
           };
         })}
       />
-      <p className="mt-2 text-[11px] text-ink-3">
-        {result.bands
-          .map((band) => `${band.band} ${band.correct}/${band.total}`)
-          .join(" · ")}{" "}
-        · {result.confidence} confidence
+
+      <div className="mx-auto mt-6 grid max-w-sm gap-2.5">
+        {result.bands.map((band) => (
+          <div className="flex items-center gap-3" key={band.band}>
+            <span className="w-9 text-left font-mono text-[11px] font-[560] text-ink-2">
+              {band.band}
+            </span>
+            <MeterBars className="flex-1" max={band.total} value={band.correct} />
+            <span className="font-mono text-[11px] text-ink-3">
+              {band.correct}/{band.total}
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 font-mono text-[11px] text-ink-3">
+        {result.confidence} confidence
       </p>
 
       <p className="mx-auto mt-5 max-w-md text-[13px] leading-relaxed text-ink-2">
@@ -69,11 +83,11 @@ export function ResultScreen({ view, onRetake }: ResultScreenProps) {
       </Callout>
 
       <div className="mt-6 flex justify-center gap-3">
-        <Button onClick={onRetake} variant="secondary">
+        <Button onClick={onRetake} size="lg" variant="secondary">
           Retake
         </Button>
         <Link href="/create/">
-          <Button>Save &amp; continue</Button>
+          <Button size="lg">Save &amp; continue</Button>
         </Link>
       </div>
     </Card>

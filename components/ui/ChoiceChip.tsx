@@ -15,13 +15,14 @@ export function ChoiceChip({
   ...props
 }: ChoiceChipProps) {
   return (
-    <label className={cn("cursor-pointer", className)}>
+    <label className={cn("cursor-pointer touch-manipulation", className)}>
       <input type={type} className="peer sr-only" {...props} />
       <span
         className={cn(
-          "flex items-center justify-center gap-1.5 rounded-lg border border-line bg-surface px-3.5 py-2 text-[13px] text-ink-2 select-none",
-          "peer-checked:border-accent peer-checked:bg-accent peer-checked:font-semibold peer-checked:text-on-accent",
-          "peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent",
+          "flex items-center justify-center gap-2 rounded-md border border-line bg-surface px-4 py-[9px] text-sm text-ink shadow-card transition-all duration-150 select-none",
+          "hover:-translate-y-px hover:border-ink-3",
+          "peer-checked:border-accent peer-checked:bg-accent-soft peer-checked:font-[540] peer-checked:text-accent-strong",
+          "peer-focus-visible:shadow-ring peer-focus-visible:outline-none",
           "peer-disabled:cursor-default peer-disabled:opacity-50",
           showCheck && "peer-checked:before:content-['✓']",
         )}

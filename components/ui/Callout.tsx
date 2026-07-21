@@ -17,12 +17,50 @@ const iconClasses: Record<CalloutTone, string> = {
   error: "text-vermilion",
 };
 
-const defaultIcons: Record<CalloutTone, string> = {
-  info: "ℹ",
-  success: "✓",
-  warning: "⚠",
-  error: "✕",
-};
+function DefaultIcon({ tone }: { tone: CalloutTone }) {
+  const common = {
+    "aria-hidden": true,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    className: "size-5",
+  };
+  switch (tone) {
+    case "success":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M8.5 12.5l2.5 2.5 4.5-5" />
+        </svg>
+      );
+    case "warning":
+      return (
+        <svg {...common}>
+          <path d="M12 4l8.5 15h-17z" />
+          <path d="M12 10v4" />
+          <path d="M12 17.2v.01" />
+        </svg>
+      );
+    case "error":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M9 9l6 6M15 9l-6 6" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 11v5" />
+          <path d="M12 8v.01" />
+        </svg>
+      );
+  }
+}
 
 export type CalloutProps = ComponentProps<"div"> & {
   tone?: CalloutTone;
@@ -40,14 +78,14 @@ export function Callout({
     <div
       role={tone === "error" ? "alert" : undefined}
       className={cn(
-        "flex items-start gap-2.5 rounded-[9px] border px-3.5 py-3 text-[13px] leading-relaxed",
+        "flex items-start gap-3 rounded-md border px-4 py-3.5 text-[13px] leading-relaxed",
         toneClasses[tone],
         className,
       )}
       {...props}
     >
-      <span aria-hidden className={cn("text-[15px]", iconClasses[tone])}>
-        {icon ?? defaultIcons[tone]}
+      <span aria-hidden className={cn("mt-px flex-none", iconClasses[tone])}>
+        {icon ?? <DefaultIcon tone={tone} />}
       </span>
       <div className="min-w-0 flex-1">{children}</div>
     </div>
